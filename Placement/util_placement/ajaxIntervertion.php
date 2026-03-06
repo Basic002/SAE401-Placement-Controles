@@ -1,14 +1,19 @@
 <?php
 	session_start();
 
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+		http_response_code(405);
+		exit;
+	}
+
 	/**
 	*	On récupère les identifiants de ligne et de colonne pour les deux places à intervertir
 	*/
-	$utilSalle = $_GET['utilSalle'];
-	$utilAcol = $_GET['utilAcol'];
-	$utilAlin = $_GET['utilAlin'];
-	$utilBcol = $_GET['utilBcol'];
-	$utilBlin = $_GET['utilBlin'];
+	$utilSalle = $_POST['utilSalle'];
+	$utilAcol = $_POST['utilAcol'];
+	$utilAlin = $_POST['utilAlin'];
+	$utilBcol = $_POST['utilBcol'];
+	$utilBlin = $_POST['utilBlin'];
 //echo "entrée";
 //print_r($_SESSION['placeUtil'][$utilSalle]);
 	/**
