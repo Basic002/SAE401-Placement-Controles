@@ -5,6 +5,15 @@ Ce projet a pour objectif la refonte, l'optimisation et le développement de l'a
 
 ---
 
+## LIEN DevWeb
+
+L'application est actuellement déployée et accessible en ligne sur le serveur de l'IUT. 
+Vous pouvez tester son fonctionnement directement via le lien ci-dessous :
+
+👉 https://devweb.iutmetz.univ-lorraine.fr/~e40250u/sae401/Placement
+
+---
+
 ## Gestion de Projet (Trello)
 
 Le suivi des tâches, l'organisation de nos sprints et la répartition du travail en équipe sont pilotés de manière agile sur notre tableau Trello. 
