@@ -1,206 +1,137 @@
 <?php
-	// Demarrage session php
-	session_start();
-	
-	// Si login non detecte, renvoie vers la page de login
-	if(!isset($_SESSION['login']))
-	{
-		header('Location: login.php');
-		exit();
-	}
-	include('connexion.php');
-?>
+// Démarrage de la session php
+session_start();
 
-<?php
-	$sql = 'SELECT * FROM enseignant WHERE login = :login';
-    	$stmt = $pdo->prepare($sql);
+// Inclusion de la connexion à la base de données
+require_once 'config/connexion.php';
 
-    	// Exécution de la requête avec le login de session
-    	$stmt->execute(['login' => $_SESSION['login']]);
+// INTERCEPTION DE L'URL
+// On regarde l'action demandée (si on utilise encore ?p=, on le convertit en action)
+$action = 'home'; // Page par défaut
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+} elseif (isset($_GET['p'])) {
+    $action = $_GET['p']; 
+}
 
-    	// Récupération du résultat
-    	$array = $stmt->fetch();
-	/*$mdp=mysql_query('SELECT * FROM enseignant WHERE login=\''.$_SESSION['login'].'\'');
-	$array=mysql_fetch_array($mdp);
-*/
-	if($array['pass']==md5('declic'))
-	{
-            ?>
-                        <form action="index.php" method="post">
-                            <div id="fondOpaque" style></div>
-                            <div style="z-index: 2; position: absolute; position: center; color: white">    
-                                
-                                <div style="text-align: center; position:  relative; display: block; width: 550px; height: 225px; background-color: #888; border-radius: 8px; margin-left: 42%; margin-top: 25%">
-                                <br>
-                                    <?php
-                                    echo'<w>Premi&egrave;re connexion, veuillez changer votre mot de passe !<w>'
-                                    ?>
-                                
-                                <br>
-                                <br>
-                                <br>
-                                
-                                <?php
-                                echo'<w>Login :<w>'
-                                ?>
-                                <input id="champ" type="text" name="login" style="border-radius: 4px; height: 30px; color:gray;" value="<?php if (isset($_POST['login'])) echo htmlentities(trim($_POST['login'])); else echo 'Login'; ?>" onblur="if(this.value=='') {this.style.color='gray'; this.value='Login'}" onfocus="this.style.color='black'; if(this.value=='Login') {this.value=''} "> 
-                                
-                                <?php
-                                echo'<w>Mot de passe :<w>'
-                                ?>
-                                <input id="champ" type="<?php echo $passtype ?>" name="newpass" style="position: relative; border-radius: 4px; height: 30px; color:gray;" value="<?php echo 'Nouveau mot de passe'; ?>" onblur="if(this.value=='') {this.style.color='gray'; this.value='Nouveau mot de passe'; this.type='text'}" onfocus="this.style.color='black'; if(this.value=='Nouveau mot de passe') {this.value=''; this.type='password'}">   
+// VÉRIFICATION DE LA SÉCURITÉ
+// 1. Si non connecté et qu'on n'essaie pas de se connecter, redirection vers login
+if (!isset($_SESSION['login']) && $action !== 'login') {
+    header('Location: index.php?action=login');
+    exit();
+}
 
-                                <br><br><br><br>
-                                
-                                        <input id="bouttonmodif" type="submit" name="validemodif" value="Valider">
-                                </div>
+// 2. Gestion de la première connexion (mot de passe 'declic')
+if (isset($_SESSION['login'])) {
+    $sql = 'SELECT * FROM enseignant WHERE login = :login';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['login' => $_SESSION['login']]);
+    $user = $stmt->fetch();
 
-                            </div>
-                            </div>
-                        </form>
-            
-                        <?php
-                        // TEST SI L'USER A VALIDER LA MODIFICATION (PASS)
-                        if(isset($_POST['validemodif']) && $_POST['validemodif']=="Valider")
-                            {
+    // Si le mot de passe est toujours celui par défaut ('declic')
+    if ($user && $user['pass'] == md5('declic') && $action !== 'logout' && $action !== 'changer_mdp') {
+        // On force l'action sur le changement de mot de passe
+        $action = 'changer_mdp';
+    }
+}
 
-                            if(($_POST['newpass'] == "declic")||($_POST['newpass']== "Nouveau mot de passe") || ($_POST['login']!=$_SESSION['login']))
-                                {
-                                   
-                                    echo "<script>alert('Mot de passe incorrect'); window.location.replace('index.php');</script>";
-                                }
-                                else
-                                {
-									$sql = 'UPDATE enseignant SET pass = :newpass WHERE login = :login';
-									$stmt = $pdo->prepare($sql);
+// LE ROUTEUR
+// On appelle le bon contrôleur en fonction de l'action
+switch ($action) {
+    
+    // ================== AUTHENTIFICATION ==================
+    case 'login':
+        require_once 'controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->afficherLogin();
+        break;
 
-									$newpass = md5($_POST['newpass']);
-									$login = $_POST['login'];
+    case 'logout':
+    case 'deconnexion':
+        require_once 'controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->deconnexion();
+        break;
 
-									$stmt->execute([
-    									':newpass' => $newpass,
-    									':login' => $login
-									]);
+    case 'changer_mdp':
+        require_once 'controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->forcerChangementMdp();
+        break;
 
-                                    echo "<script>alert('Changement effectué avec succès'); window.location.replace('index.php');</script>";
+    // ================== ACCUEIL ==================
+    case 'home':
+        require_once 'controllers/HomeController.php';
+        $controller = new HomeController();
+        $controller->index();
+        break;
 
-									
-                                    //header('Location: index.php');
-                                    //exit();
-                                }
-                            }
-                        ?>
-                        
-            <script>
-                    }
-            </script>
+    // ================== GESTION ==================
+    case 'gest_mat':
+        require_once 'controllers/MatiereController.php';
+        $controller = new MatiereController();
+        $controller->index();
+        break;
 
-<?php
-	}	
-?>
+    case 'gest_ens':
+        require_once 'controllers/EnseignantController.php';
+        $controller = new EnseignantController();
+        $controller->index();
+        break;
 
+    case 'gest_ensmat':
+        require_once 'controllers/EnseignementController.php';
+        $controller = new EnseignementController();
+        $controller->index();
+        break;
 
+    case 'gest_salle':
+        require_once 'controllers/SalleController.php';
+        $controller = new SalleController();
+        $controller->index();
+        break;
 
-<html lang="">
-	<head>
-		<meta charset="utf-8">
-		<!-- ##################### IMPORT STYLE ##################### -->
-		<link rel="stylesheet" href="css/s_index.css">
-		<link rel="stylesheet" href="css/s_menu.css">
-		<link rel="stylesheet" href="css/s_generique.css">
-		
-		<title>Accueil</title>
-		
-		<!-- Test si il y a un contenu de page a charger -->
-		<?php
-			if (isset($_GET['p']))
-			{
-				$p=$_GET['p'];
-			}
-			else
-			{
-				$page="back";
-			}			
-		?>
-		
-	</head>
-	
-	<body>
-		
-		<!-- ######################################### BARRE DE MENU ######################################### -->
-		<div class="topbar">
-			<!-- ######### Bouton Home ######### -->
-			<a href="index.php?p=home"><div id="btnhome" class="btnbar_l" style="width:45px"><img src="images/home.png" style="height:65%; margin-top:5px;"></div></a>
-			
-			<?php
-				if($_SESSION['droit'])
-				{
-			?>
-					<!-- ####### Bouton Gestion ######## -->
-					<div id="btngest" class="btnbar_l">Gestion</div>
-					
-						<!-- Bloc Gestion  -->
-						<div id="blocgest" class="deroule_gest">
-							<a id="linkdec" href="index.php?p=gest_mat">
-								<div id="btndgest">Matière</div>
-							</a>
-							<a id="linkdec" href="index.php?p=gest_ens">
-								<div id="btndgest">Enseignant</div>
-							</a>
-							<a id="linkdec" href="index.php?p=gest_ensmat">
-								<div id="btndgest">Enseignement</div>
-							</a>
-							<a id="linkdec" href="index.php?p=gest_salle">
-								<div id="btndgest">Salle</div>
-							</a>
-							<a id="linkdec" href="index.php?p=gest_dpt">
-								<div id="btndgest">Département</div>
-							</a>
-							<a id="linkdec" href="index.php?p=gest_bat">
-								<div id="btndgest">Bâtiment</div>
-							</a>
-							<a id="linkdec" href="index.php?p=gest_promo">
-								<div style="border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;" id="btndgest">Promotion</div>
-							</a>
-						</div>
-						
-					<!-- ####### Bouton Placement ######## -->
-					<a id="linkdec" href="index.php?p=util_placement"><div id="btngest" class="btnbar_l">Placement</div></a>
-			<?php
-				}
-				else
-				{
-			?>
-					<!-- ####### Bouton Gestion ######## -->
-					<div id="btngest" class="btnbar_l" style="display:none">Gestion</div>
-						<!-- Bloc Gestion  -->
-						<div id="blocgest" class="deroule_gest" style="display:none"></div>
-					<!-- ####### Bouton Placement ######## -->
-					<a id="linkdec" href="index.php?p=util_placement"><div id="btngest" class="btnbar_l">Placement</div></a>
-			
-			<?php
-				}
-			?>
-					
-			
-			<!-- ####### Bouton Compte ######## -->
-			<a id="linkdec" href="deconnexion.php"><div id="btncpt" class="btnbar_r">Déconnexion</div></a>
-			
-					
-		</div>
-		
-		<!-- ############################################ CONTENU ############################################ -->
-		<div id="content">
-			<?php
-				include("content.php");
-			?>		
-		</div>
+    case 'crea_salle':
+        require_once 'controllers/SalleController.php';
+        $controller = new SalleController();
+        $controller->creer();
+        break;
 
+    case 'modif_salle':
+        require_once 'controllers/SalleController.php';
+        $controller = new SalleController();
+        $controller->modifier();
+        break;
 
-		<!-- ######################################### IMPORT SCRIPT ######################################### -->
-		<script src="javascript/jquery-1.7.1.js"></script>
-		<script src="javascript/index.js"></script>
-	
-		
-	</body>
-</html>
+    case 'gest_dpt':
+        require_once 'controllers/DepartementController.php';
+        $controller = new DepartementController();
+        $controller->index();
+        break;
+
+    case 'gest_bat':
+        require_once 'controllers/BatimentController.php';
+        $controller = new BatimentController();
+        $controller->index();
+        break;
+
+    case 'gest_promo':
+        require_once 'controllers/PromotionController.php';
+        $controller = new PromotionController();
+        $controller->index();
+        break;
+
+    // ================== PLACEMENT ==================
+    case 'util_placement':
+        require_once 'controllers/PlacementController.php';
+        $controller = new PlacementController();
+        $controller->index();
+        break;
+
+    // ================== PAGE INTROUVABLE ==================
+    default:
+        http_response_code(404);
+        echo "<h1>Erreur 404</h1><p>La page demandée n'existe pas ou le contrôleur n'est pas encore créé.</p>";
+        echo "<a href='index.php?action=home'>Retour à l'accueil</a>";
+        break;
+}
