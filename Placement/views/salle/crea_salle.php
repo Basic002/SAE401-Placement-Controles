@@ -14,9 +14,12 @@
 <!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
 
-	<!-- iFrame pour faire defiler les etapes -->
-	<iframe id="myFrame" name="stage1" src="cs_stage1.php" scrolling="no" style="border:none"></iframe>
-	
+	<!-- iFrame pour faire defiler les etapes (REMPLACÉ PAR DIV) -->
+	<div id="stage-content">
+		<?php include "cs_stage1.php"; ?>
+	</div>
+	<input type="hidden" id="currentStageName" value="stage1">
+
 	<!-- Bouton precedent/suivant -->
 	<button type="button" id="btnbef" style="display:none; float:left; margin-left:20px;">Précédent</button>
 	<button type="button" id="btnnext" style="float: right; margin-right: 20px;">Suivant</button>
