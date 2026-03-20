@@ -1,30 +1,45 @@
 <?php
-// On inclut ptrim.php avec le bon chemin
-require_once(__DIR__ . "/../utils/ptrim.php");
+/**
+ * Connexion à la base de données via PDO.
+ */
+
+// Les mdp et login ne sont pas écrits en dur dans le code. 
+// On utilise des variables d'environnement fichier .env exclu du dépôt Git
+$host     = $_ENV['DB_HOST'] ?? 'devbdd.iutmetz.univ-lorraine.fr';
+$dbname   = $_ENV['DB_NAME'] ?? 'e40250u_sae401';
+$username = $_ENV['DB_USER'] ?? 'e40250u_appli';
+$password = $_ENV['DB_PASS'] ?? '';  // Valeur réelle définie dans .env
 
 try {
-    // Configuration pour le serveur IUT (basée sur votre ancien projet qui marchait)
-    $host = 'devbdd.iutmetz.univ-lorraine.fr'; // Le serveur BDD de l'IUT
-    $dbname = 'e40250u_sae401';                // Votre nouvelle base pour la SAE 401
-    $username = 'e40250u_appli';               // Votre utilisateur BDD
-    $password = '32408231';                    // Votre mot de passe BDD
-    
-    // Création du DSN (Data Source Name)
+    // Le charset utf8mb4 est déclaré directement dans le DSN.
+    // C'est la méthode recommandée : elle garantit l'encodage
+    // AVANT l'établissement de la connexion, contrairement à
+    // SET NAMES qui s'exécute après.
     $dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";
-    
-    // Options pour gérer les erreurs et s'assurer de la compatibilité UTF-8
+
     $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        // Lance une exception PDOException sur toute erreur SQL.
+        // Sans ça, les erreurs échouent silencieusement.
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+
+        // Retourne les résultats sous forme de tableau associatif
+        // par défaut (pas besoin de le préciser à chaque fetch).
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+
+        // DÉSACTIVE l'émulation des requêtes préparées côté PHP.
+        // Avec false, c'est MySQL lui-même qui traite les paramètres,
+        // ce qui garantit une séparation stricte code/données
+        // et bloque les injections SQL de second ordre.
+        PDO::ATTR_EMULATE_PREPARES   => false,
     ];
 
-    // Création de la connexion PDO
     $pdo = new PDO($dsn, $username, $password, $options);
-    
+
 } catch (PDOException $e) {
-    // En cas d'erreur, on affiche un message propre
-    die("Erreur de connexion à la base de données : " . $e->getMessage());
+    // SÉCURITÉ : On ne transmet JAMAIS le message d'erreur technique
+    // à l'utilisateur (il peut révéler la structure de la BDD,
+    // le nom du serveur, etc.).
+    // On le journalise côté serveur pour le débogage.
+    error_log('[CONNEXION BDD] Erreur : ' . $e->getMessage());
+    die("Erreur de connexion à la base de données. Contactez l'administrateur.");
 }
-?>

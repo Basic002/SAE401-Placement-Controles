@@ -1,0 +1,7 @@
+# Fichiers de configuration sensibles - exclus du dépôt
+.env
+config/connexion.php
+
+# Logs
+*.log
+/logs/
