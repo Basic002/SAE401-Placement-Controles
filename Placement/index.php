@@ -47,7 +47,7 @@ switch ($action) {
     case 'login':
         require_once 'controllers/AuthController.php';
         $controller = new AuthController();
-        $controller->afficherLogin();
+        $controller->login();
         break;
 
     case 'logout':

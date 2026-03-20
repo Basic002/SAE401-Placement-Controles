@@ -24,8 +24,8 @@ $data = [
     'prenom' => 'Jean',
     'sexe'   => 'M',
     'login'  => 'jdupont',
-    'pass'   => 'MotDePasseInitial!2025',
-    'admin'  => 0,
+    'pass'   => '1234',
+    'admin'  => 1,
 ];
 
 // ============================================================

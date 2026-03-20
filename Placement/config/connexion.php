@@ -3,6 +3,27 @@
  * Connexion à la base de données via PDO.
  */
 
+// Chemin vers fichier .env
+$envPath = __DIR__ . '/../../.env';
+
+if (file_exists($envPath)) {
+    // Lit le fichier ligne par ligne
+    $lignes = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lignes as $ligne) {
+        // Ignorer les commentaires (lignes commençant par # ou #)
+        if (strpos(trim($ligne), '#') === 0 || strpos(trim($ligne), '[source') === 0) {
+            continue;
+        }
+        // Séparer le nom et la valeur
+        if (strpos($ligne, '=') !== false) {
+            list($nom, $valeur) = explode('=', $ligne, 2);
+            $_ENV[trim($nom)] = trim($valeur);
+        }
+    }
+} else {
+    die("Fichier .env introuvable.");
+}
+
 // Les mdp et login ne sont pas écrits en dur dans le code. 
 // On utilise des variables d'environnement fichier .env exclu du dépôt Git
 $host     = $_ENV['DB_HOST'] ?? 'devbdd.iutmetz.univ-lorraine.fr';
