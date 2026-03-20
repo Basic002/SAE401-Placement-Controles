@@ -1,27 +1,56 @@
 <?php
 class AuthController {
     
-    // Méthode appelée par index.php quand l'action est 'login'
-    public function afficherLogin() {
-        global $pdo; // Permet à ton fichier login.php d'utiliser la connexion BDD de l'index
+    // Affiche le formulaire ou traite la connexion
+    public function login() {
+        global $pdo;
+        $erreur = null;
+
+        // Si le formulaire est soumis
+        if (isset($_POST['connexion']) && $_POST['connexion'] == 'Connexion') {
+            $login = $_POST['login'] ?? '';
+            $pass = $_POST['pass'] ?? '';
+
+            if (!empty($login) && !empty($pass)) {
+                try {
+                    // Vérification des identifiants
+                    $sql = 'SELECT count(*) as count, admin FROM enseignant WHERE login = :login AND pass = :pass';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute(['login' => $login, 'pass' => md5($pass)]);
+                    $user = $stmt->fetch();
+
+                    if ($user && $user['count'] == 1) {
+                        // Hydratation de la session
+                        $_SESSION['login'] = $login;
+                        $_SESSION['droit'] = $user['admin'];
+                        
+                        header('Location: index.php?action=home');
+                        exit();
+                    } else {
+                        $erreur = 'Compte non reconnu.';
+                    }
+                } catch (PDOException $e) {
+                    $erreur = "Erreur de base de données.";
+                }
+            } else {
+                $erreur = 'Au moins un des champs est vide.';
+            }
+        }
+
+        // On inclut la vue en lui passant la variable $erreur si elle existe
         require_once 'views/auth/login.php';
     }
 
-    // Méthode pour se déconnecter
     public function deconnexion() {
-        // On vide la session
         $_SESSION = array();
         session_destroy();
-        // On redirige vers l'accueil/login
         header('Location: index.php?action=login');
         exit();
     }
 
-    // Méthode pour le changement de mot de passe obligatoire
     public function forcerChangementMdp() {
-        echo "<h1>Changement de mot de passe requis</h1>";
-        echo "<p>Veuillez changer votre mot de passe par défaut 'declic'. (Page à développer)</p>";
-        // Plus tard, tu pourras inclure une vue ici : require_once 'views/auth/changer_mdp.php';
+        // Logique pour afficher la vue de changement de mot de passe
+        require_once 'views/auth/changer_mdp.php';
     }
 }
 ?>
