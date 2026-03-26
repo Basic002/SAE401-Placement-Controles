@@ -17,9 +17,7 @@ function selectionCombiComplete() {
 function updateSubmitState() {
     const btnSuivant = document.getElementById('btnSuivant');
     if (!btnSuivant) return;
-    const peutSoumettre = champsDeBaseComplets() && (
-        combinaisonsCourantes.length > 0 || selectionCombiComplete()
-    );
+    const peutSoumettre = champsDeBaseComplets() && selectionCombiComplete();
     btnSuivant.disabled = !peutSoumettre;
 }
 
@@ -90,15 +88,8 @@ async function matDynamique() {
 }
 
 function affBtn() {
-    const promo = document.getElementById('sel_promo').value;
-    const salle = document.getElementById('sel_salle').value;
-    const mat = document.getElementById('sel_matiere');
     const btn = document.getElementById('btnAddCombi');
-    if (promo && salle && mat && mat.value) {
-        btn.style.display = '';
-    } else {
-        btn.style.display = 'none';
-    }
+    if (btn) btn.style.display = 'none';
     updateSubmitState();
 }
 
@@ -184,20 +175,10 @@ function escHtml(str) {
     }
 })();
 
-document.getElementById('formStage1')?.addEventListener('submit', async function (e) {
-    // Si aucune combinaison n'est encore ajoutée, on tente d'ajouter
-    // automatiquement la sélection courante avant de passer à l'étape 2.
-    if (combinaisonsCourantes.length === 0 && selectionCombiComplete()) {
+document.getElementById('formStage1')?.addEventListener('submit', function (e) {
+    if (!selectionCombiComplete()) {
         e.preventDefault();
-        const ok = await recupCombi();
-        if (ok) {
-            this.submit();
-        }
-        return;
-    }
-    if (combinaisonsCourantes.length === 0) {
-        e.preventDefault();
-        alert('Ajoutez au moins une combinaison avant de continuer.');
+        alert('Merci de choisir une promotion, un groupe, une matière et une salle.');
     }
 });
 

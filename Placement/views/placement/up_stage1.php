@@ -36,7 +36,7 @@
 
         <div class="form-group">
             <label for="sel_promo">Promotion</label>
-            <select id="sel_promo" onchange="grDynamique()">
+            <select id="sel_promo" name="id_promo" onchange="grDynamique()">
                 <option value="">-- Promotion --</option>
                 <?php foreach ($promotions as $promo): ?>
                     <option value="<?php echo (int)$promo['id_promo']; ?>">
@@ -48,21 +48,21 @@
 
         <div class="form-group">
             <label for="sel_groupe">Groupe</label>
-            <select id="sel_groupe" style="display:none">
+            <select id="sel_groupe" name="id_groupe" style="display:none">
                 <option value="0">Toute la promo</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="sel_matiere">Matière</label>
-            <select id="sel_matiere" style="display:none">
+            <select id="sel_matiere" name="id_mat" style="display:none">
                 <option value="">-- Matière --</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="sel_salle">Salle</label>
-            <select id="sel_salle" onchange="affBtn()">
+            <select id="sel_salle" name="id_salle" onchange="affBtn()">
                 <option value="">-- Salle --</option>
                 <?php foreach ($salles as $salle): ?>
                     <option value="<?php echo (int)$salle['id_salle']; ?>">

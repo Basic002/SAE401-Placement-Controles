@@ -97,6 +97,49 @@ class PlacementController extends Controller
             $_SESSION['up']['date_devoir'] = trim($_POST['date_devoir'] ?? '');
             $_SESSION['up']['heure_debut'] = trim($_POST['heure_debut'] ?? '');
             $_SESSION['up']['duree']       = trim($_POST['duree']       ?? '');
+
+            // Fallback robuste : si aucune combinaison n'est en session,
+            // on la construit depuis les champs du formulaire étape 1.
+            if (empty($_SESSION['up']['combinaisons'])) {
+                $idPromo  = (int) ($_POST['id_promo']  ?? 0);
+                $idGroupe = (int) ($_POST['id_groupe'] ?? 0);
+                $idSalle  = (int) ($_POST['id_salle']  ?? 0);
+                $idMat    = (int) ($_POST['id_mat']    ?? 0);
+
+                if ($idPromo > 0 && $idSalle > 0 && $idMat > 0) {
+                    $salleData = SalleModel::getPlanBySalleId($pdo, $idSalle);
+                    $promo     = PromotionModel::findById($pdo, $idPromo);
+                    $salle     = SalleModel::findById($pdo, $idSalle);
+                    $matiere   = MatiereModel::findById($pdo, $idMat);
+
+                    if ($salleData && $promo && $salle && $matiere) {
+                        $intercal         = (int) ($salleData['intercal'] ?? 1);
+                        $capacite         = (int) ($salleData['capacite'] ?? 0);
+                        $placesEffectives = $intercal === 1 ? (int) ceil($capacite / 2) : $capacite;
+                        $nbEtudiants      = EtudiantModel::countByPromoOrGroupe($pdo, $idPromo, $idGroupe);
+
+                        if ($nbEtudiants > 0 && $nbEtudiants <= $placesEffectives) {
+                            $labelPromo = ($promo['nom_dpt'] ?? '') . ' ' . ($promo['nom_promo'] ?? '');
+                            if ($idGroupe > 0) {
+                                $groupe      = GroupeModel::findById($pdo, $idGroupe);
+                                $labelPromo .= ' — ' . ($groupe['nom_groupe'] ?? "Groupe {$idGroupe}");
+                            }
+
+                            $_SESSION['up']['combinaisons'] = [[
+                                'id_promo'    => $idPromo,
+                                'id_groupe'   => $idGroupe,
+                                'id_salle'    => $idSalle,
+                                'id_mat'      => $idMat,
+                                'intercal'    => $intercal,
+                                'label_promo' => $labelPromo,
+                                'nom_salle'   => $salle['nom_salle'] ?? "Salle {$idSalle}",
+                                'nom_mat'     => $matiere['nom_mat'] ?? "Matière {$idMat}",
+                                'nb_etud'     => $nbEtudiants,
+                            ]];
+                        }
+                    }
+                }
+            }
         }
 
         $combinaisons = $_SESSION['up']['combinaisons'] ?? [];
