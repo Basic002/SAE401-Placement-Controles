@@ -1,31 +1,38 @@
-BATIMENT ( <u>id_bat</u>, nom_bat, ad_bat )
+**BATIMENT** ( **id_bat**, nom_bat, ad_bat )
 
-DEPARTEMENT ( <u>id_dpt</u>, nom_dpt )
+**DEPARTEMENT** ( **id_dpt**, nom_dpt )
 
-PLAN ( <u>id_plan</u>, donnee, capacite_max )
+**PLAN** ( **id_plan**, donnee, capacite_max )
 
-PROMOTION ( <u>id_promo</u>, nom_promo, annee, #<u>id_dpt</u> )
+**PROMOTION** ( **id_promo**, nom_promo, annee, #*id_dpt* )
 
-SALLE ( <u>id_salle</u>, nom_salle, etage, #<u>id_bat</u>, #<u>id_dpt</u>, #<u>id_plan</u>, capacite, intercal, type_salle )
+**SALLE** ( **id_salle**, nom_salle, etage, #*id_bat*, #*id_dpt*, #*id_plan*, capacite, intercal, type_salle )
 
-GROUPE ( <u>id_groupe</u>, nom_groupe, #<u>id_promo</u> )
+**GROUPE** ( **id_groupe**, nom_groupe, #*id_promo* )
 
-MATIERE ( <u>id_mat</u>, nom_mat, #<u>id_promo</u> )
+**MATIERE** ( **id_mat**, nom_mat, #*id_promo* )
 
-ENSEIGNANT ( <u>id_ens</u>, nom_ens, prenom_ens, sexe, login, pass, admin )
+**ENSEIGNANT** ( **id_ens**, nom_ens, prenom_ens, sexe, login, pass, admin )
 
-ETUDIANT ( <u>id_etudiant</u>, nom_etudiant, prenom_etudiant, #<u>id_groupe</u>, demigr, tiers_temps, mob_reduite, premier_rang )
+**ETUDIANT** ( **id_etudiant**, nom_etudiant, prenom_etudiant, #*id_groupe*, demigr, tiers_temps, mob_reduite, premier_rang )
 
-DEVOIR ( <u>id_devoir</u>, nom_devoir, date_devoir, heure_devoir, duree_devoir, #<u>id_mat</u> )
+**DEVOIR** ( **id_devoir**, nom_devoir, date_devoir, heure_devoir, duree_devoir, #*id_mat* )
 
-ENSEIGNE ( #<u>id_mat</u>, #<u>id_ens</u> )
+**ENSEIGNE** ( #**id_mat**, #**id_ens** )
 
-DEVOIR_GROUPE ( #<u>id_devoir</u>, #<u>id_groupe</u> )
+**DEVOIR_GROUPE** ( #**id_devoir**, #**id_groupe** )
 
-DEVOIR_PROMO ( #<u>id_devoir</u>, #<u>id_promo</u> )
+**DEVOIR_PROMO** ( #**id_devoir**, #**id_promo** )
 
-DEVOIR_SALLE ( #<u>id_devoir</u>, #<u>id_salle</u> )
+**DEVOIR_SALLE** ( #**id_devoir**, #**id_salle** )
 
-PLACEMENT ( #<u>id_etudiant</u>, #<u>id_devoir</u>, #<u>id_salle</u>, place_x, place_y )
+**PLACEMENT** ( #**id_etudiant**, #**id_devoir**, #*id_salle*, place_x, place_y )
 
-SURVEILLE ( #<u>id_ens</u>, #<u>id_devoir</u>, #<u>id_salle</u> )
+**SURVEILLE** ( #**id_ens**, #**id_devoir**, #*id_salle* )
+
+---
+
+*Légende :*
+* **Gras** : Clé Primaire (PK)
+* #*Italique* : Clé Étrangère (FK)
+* #**Gras** : Clé Primaire ET Clé Étrangère
