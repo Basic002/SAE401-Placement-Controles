@@ -6,7 +6,7 @@
 ?>
 
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_crea_salle.css">
+<link rel="stylesheet" type="text/css" href="public/css/s_crea_salle.css">
 
 <!-- #################### TITRE PRINCIPAL ################### -->
 <div class="titrecontenu">Création salle</div>
@@ -35,4 +35,4 @@
 </div>
 
 <!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/crea_salle.js"></script>
+<script src="public/javascript/crea_salle.js"></script>
