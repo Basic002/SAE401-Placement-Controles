@@ -79,7 +79,13 @@ function intervertir()
 {
 	const salleConcernee = blocOnglet1.style.display===""?0:1;
 	console.log(salleConcernee)
-	$.get('ajaxIntervertion.php?utilSalle='+salleConcernee+'&utilAcol='+eleveA[0]+'&utilAlin='+eleveA[1]+'&utilBcol='+eleveB[0]+'&utilBlin='+eleveB[1], function(data){
+	$.post('ajaxIntervertion.php', {
+		utilSalle: salleConcernee,
+		utilAcol: eleveA[0],
+		utilAlin: eleveA[1],
+		utilBcol: eleveB[0],
+		utilBlin: eleveB[1]
+	}, function(data){
 		if(data){
 			console.log(data);
 			console.log(data.length);
