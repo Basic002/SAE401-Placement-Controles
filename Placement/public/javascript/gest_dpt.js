@@ -3,7 +3,7 @@
 	var bloccreadpt=document.getElementById('bloccreadpt');
 	
 	btncreadpt.addEventListener('click', function(e) {
-		bloccreadpt.style.display='';
+		bloccreadpt.style.display='block';
 	}, false);
 	
 	

@@ -12,8 +12,9 @@ class DepartementController extends Controller
         global $pdo;
         $this->exigerAdmin();
 
-        $erreur  = null;
-        $succes  = null;
+        $erreur             = null;
+        $succes             = null;
+        $reopenCreateForm   = false;
 
         // --- SUPPRESSION ---
         if (isset($_POST['_action']) && $_POST['_action'] === 'delete') {
@@ -28,11 +29,13 @@ class DepartementController extends Controller
         if (isset($_POST['_action']) && $_POST['_action'] === 'create') {
             $nomDpt = trim($_POST['nom_dpt'] ?? '');
             if ($nomDpt === '') {
-                $erreur = 'Le nom du département est obligatoire.';
+                $erreur            = 'Nom obligatoire : saisissez le nom du département avant de cliquer sur « Ajouter ».';
+                $reopenCreateForm  = true;
             } else {
                 $result = DepartementModel::create($pdo, $nomDpt);
                 if ($result === false) {
-                    $erreur = 'Ce département existe déjà.';
+                    $erreur            = 'Ce département existe déjà.';
+                    $reopenCreateForm  = true;
                 } else {
                     $succes = 'Département créé.';
                 }
@@ -52,9 +55,10 @@ class DepartementController extends Controller
         $departements = DepartementModel::findAll($pdo);
 
         $this->render('departement/gest_dpt.php', 'Gestion des départements', [
-            'departements' => $departements,
-            'erreur'       => $erreur,
-            'succes'       => $succes,
+            'departements'       => $departements,
+            'erreur'             => $erreur,
+            'succes'             => $succes,
+            'reopenCreateForm'   => $reopenCreateForm,
         ]);
     }
 }

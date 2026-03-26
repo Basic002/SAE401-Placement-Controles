@@ -13,8 +13,9 @@ class MatiereController extends Controller
         global $pdo;
         $this->exigerAdmin();
 
-        $erreur = null;
-        $succes = null;
+        $erreur             = null;
+        $succes             = null;
+        $reopenCreateForm  = false;
 
         // --- SUPPRESSION ---
         if (isset($_POST['_action']) && $_POST['_action'] === 'delete') {
@@ -29,12 +30,17 @@ class MatiereController extends Controller
         if (isset($_POST['_action']) && $_POST['_action'] === 'create') {
             $nomMat  = trim($_POST['nom_mat']  ?? '');
             $idPromo = (int) ($_POST['id_promo'] ?? 0);
-            if ($nomMat === '' || $idPromo === 0) {
-                $erreur = 'Tous les champs sont obligatoires.';
+            if ($nomMat === '') {
+                $erreur            = 'Nom obligatoire : saisissez le nom de la matière avant de cliquer sur « Ajouter ».';
+                $reopenCreateForm = true;
+            } elseif ($idPromo === 0) {
+                $erreur            = 'Promotion obligatoire : choisissez une promotion.';
+                $reopenCreateForm = true;
             } else {
                 $result = MatiereModel::create($pdo, $nomMat, $idPromo);
                 if ($result === false) {
-                    $erreur = 'Cette matière existe déjà pour cette promotion.';
+                    $erreur            = 'Cette matière existe déjà pour cette promotion.';
+                    $reopenCreateForm = true;
                 } else {
                     $succes = 'Matière créée.';
                 }
@@ -60,10 +66,11 @@ class MatiereController extends Controller
         $promotions = PromotionModel::findAll($pdo);
 
         $this->render('matiere/gest_mat.php', 'Gestion des matières', [
-            'matieres'   => $matieres,
-            'promotions' => $promotions,
-            'erreur'     => $erreur,
-            'succes'     => $succes,
+            'matieres'           => $matieres,
+            'promotions'         => $promotions,
+            'erreur'             => $erreur,
+            'succes'             => $succes,
+            'reopenCreateForm'   => $reopenCreateForm,
         ]);
     }
 

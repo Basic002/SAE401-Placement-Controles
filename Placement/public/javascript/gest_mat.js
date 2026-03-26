@@ -3,7 +3,7 @@
 	var bloccreamat=document.getElementById('bloccreamat');
 	
 	btncrea.addEventListener('click', function(e) {
-		bloccreamat.style.display='';
+		bloccreamat.style.display='block';
 	}, false);
 	
 	// ########################## SUPPRESSION DEPARTEMENT ##########################

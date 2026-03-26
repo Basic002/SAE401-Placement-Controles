@@ -18,7 +18,7 @@
     <div id="btncrea">Créer Enseignant</div>
 
     <!-- BLOC CREATION ENSEIGNANT -->
-    <div id="bloccreaens" style="display:none">
+    <div id="bloccreaens" style="display:<?= !empty($reopenCreateForm) ? 'block' : 'none' ?>">
         <form action="index.php?action=gest_ens" method="post">
             <input type="hidden" name="_action" value="create">
             <label for="nom_ens">Nom &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
@@ -97,6 +97,7 @@
 <div id="fondOpaque" style="display:none"></div>
 
 <!-- ################## IMPORT JAVASCRIPT ################### -->
+<script src="public/javascript/gest_ens.js"></script>
 <script src="public/javascript/onglet_gest.js"></script>
 <script>
 function suppr_ens(id) {

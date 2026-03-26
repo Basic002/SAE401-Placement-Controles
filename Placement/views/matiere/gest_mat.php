@@ -18,13 +18,14 @@
     <div id="btncrea">Cr&eacute;er mati&egrave;re</div>
 
     <!-- BLOC CREATION MATIERE -->
-    <div id="bloccreamat" style="display:none">
+    <div id="bloccreamat" style="display:<?= !empty($reopenCreateForm) ? 'block' : 'none' ?>">
         <form action="index.php?action=gest_mat" method="post">
             <input type="hidden" name="_action" value="create">
             <label for="nom_mat">Nom </label>
-            <input type="text" id="nom_mat" name="nom_mat"><br>
+            <input type="text" id="nom_mat" name="nom_mat" required autocomplete="off"><br>
             <label for="id_promo">Promotion </label>
-            <select id="id_promo" name="id_promo">
+            <select id="id_promo" name="id_promo" required>
+                <option value="">— Choisir une promotion —</option>
                 <?php foreach ($promotions as $promo): ?>
                     <option value="<?= (int)$promo['id_promo'] ?>">
                         <?= htmlspecialchars($promo['nom_dpt'] . ' ' . $promo['nom_promo'] . ' ' . $promo['annee'], ENT_QUOTES, 'UTF-8') ?>

@@ -18,11 +18,11 @@
     <div id="btncrea">Cr&eacute;er d&eacute;partement</div>
 
     <!-- BLOC CREATION DEPARTEMENT -->
-    <div id="bloccreadpt" style="display:none">
+    <div id="bloccreadpt" style="display:<?= !empty($reopenCreateForm) ? 'block' : 'none' ?>">
         <form action="index.php?action=gest_dpt" method="post">
             <input type="hidden" name="_action" value="create">
             <label for="nom_dpt">Nom </label>
-            <input type="text" id="nom_dpt" name="nom_dpt"><br>
+            <input type="text" id="nom_dpt" name="nom_dpt" required autocomplete="off"><br>
             <input type="submit" value="Ajouter">
             <input type="button" value="Annuler" onclick="document.getElementById('bloccreadpt').style.display='none';">
         </form>

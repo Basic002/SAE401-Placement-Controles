@@ -28,8 +28,9 @@ class EnseignantController extends Controller
         global $pdo;
         $this->exigerAdmin();
 
-        $erreur = null;
-        $succes = null;
+        $erreur             = null;
+        $succes             = null;
+        $reopenCreateForm   = false;
 
         // --- SUPPRESSION ---
         if (isset($_POST['_action']) && $_POST['_action'] === 'delete') {
@@ -50,7 +51,8 @@ class EnseignantController extends Controller
             $sexe      = $_POST['sexe'] ?? null;
 
             if ($nomEns === '' || $prenomEns === '') {
-                $erreur = 'Le nom et le prénom sont obligatoires.';
+                $erreur            = 'Le nom et le prénom sont obligatoires.';
+                $reopenCreateForm  = true;
             } else {
                 // Vérification doublon (nom + prénom)
                 $exist = $pdo->prepare(
@@ -58,7 +60,8 @@ class EnseignantController extends Controller
                 );
                 $exist->execute(['n' => strtoupper($nomEns), 'p' => ucfirst($prenomEns)]);
                 if ((int) $exist->fetchColumn() > 0) {
-                    $erreur = 'Cet enseignant existe déjà.';
+                    $erreur            = 'Cet enseignant existe déjà.';
+                    $reopenCreateForm  = true;
                 } else {
                     $login = self::genererLogin($nomEns, $prenomEns);
                     // Le mot de passe par défaut est 'declic' (hashé en bcrypt).
@@ -87,9 +90,10 @@ class EnseignantController extends Controller
         $enseignants = EnseignantModel::findAll($pdo);
 
         $this->render('enseignant/gest_ens.php', 'Gestion des enseignants', [
-            'enseignants' => $enseignants,
-            'erreur'      => $erreur,
-            'succes'      => $succes,
+            'enseignants'        => $enseignants,
+            'erreur'             => $erreur,
+            'succes'             => $succes,
+            'reopenCreateForm'   => $reopenCreateForm,
         ]);
     }
 }
