@@ -72,7 +72,7 @@
             </select>
         </div>
 
-        <button type="button" id="btnAddCombi" style="display:none" onclick="recupCombi()">+</button>
+        <button type="button" id="btnAddCombi" style="display:none" onclick="recupCombi()">Ajouter la combinaison</button>
 
         <div id="tabRecap"></div>
 

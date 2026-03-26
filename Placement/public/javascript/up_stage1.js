@@ -1,43 +1,92 @@
+let combinaisonsCourantes = [];
+
+function champsDeBaseComplets() {
+    const date = document.getElementById('date_devoir')?.value;
+    const heure = document.getElementById('heure_debut')?.value;
+    const duree = document.getElementById('duree')?.value;
+    return Boolean(date && heure && duree);
+}
+
+function selectionCombiComplete() {
+    const promo = document.getElementById('sel_promo')?.value;
+    const salle = document.getElementById('sel_salle')?.value;
+    const mat = document.getElementById('sel_matiere')?.value;
+    return Boolean(promo && salle && mat);
+}
+
+function updateSubmitState() {
+    const btnSuivant = document.getElementById('btnSuivant');
+    if (!btnSuivant) return;
+    const peutSoumettre = champsDeBaseComplets() && (
+        combinaisonsCourantes.length > 0 || selectionCombiComplete()
+    );
+    btnSuivant.disabled = !peutSoumettre;
+}
+
 // Fetch groupe list when promo changes
 async function grDynamique() {
     const idPromo = document.getElementById('sel_promo').value;
-    if (!idPromo) return;
+    const selGroupe = document.getElementById('sel_groupe');
+    const selMatiere = document.getElementById('sel_matiere');
+    const btnAdd = document.getElementById('btnAddCombi');
 
-    const resp = await fetch('index.php?action=ajax_groupe', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'idPromo=' + encodeURIComponent(idPromo)
-    });
-    const data = await resp.json();
+    if (!idPromo) {
+        selGroupe.innerHTML = '<option value="0">Toute la promo</option>';
+        selMatiere.innerHTML = '<option value="">-- Matière --</option>';
+        selGroupe.style.display = 'none';
+        selMatiere.style.display = 'none';
+        btnAdd.style.display = 'none';
+        updateSubmitState();
+        return;
+    }
 
-    // Repopulate sel_groupe
-    const sel = document.getElementById('sel_groupe');
-    sel.innerHTML = '<option value="0">Toute la promo</option>';
-    data.forEach(g => {
-        sel.innerHTML += '<option value="' + g.id_groupe + '">' + escHtml(g.nom_groupe) + '</option>';
-    });
-    sel.style.display = '';
+    try {
+        const resp = await fetch('index.php?action=ajax_groupe', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'idPromo=' + encodeURIComponent(idPromo)
+        });
+        const data = await resp.json();
 
-    await matDynamique();
-    affBtn();
+        // Repopulate sel_groupe
+        selGroupe.innerHTML = '<option value="0">Toute la promo</option>';
+        data.forEach(g => {
+            selGroupe.innerHTML += '<option value="' + g.id_groupe + '">' + escHtml(g.nom_groupe) + '</option>';
+        });
+        selGroupe.style.display = '';
+
+        await matDynamique();
+        affBtn();
+    } catch (e) {
+        alert('Impossible de charger les groupes pour cette promotion.');
+    }
 }
 
 async function matDynamique() {
     const idPromo = document.getElementById('sel_promo').value;
-    const resp = await fetch('index.php?action=ajax_matiere', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'idPromo=' + encodeURIComponent(idPromo)
-    });
-    const data = await resp.json();
-
     const sel = document.getElementById('sel_matiere');
-    sel.innerHTML = '<option value="">-- Matière --</option>';
-    data.forEach(m => {
-        sel.innerHTML += '<option value="' + m.id_mat + '">' + escHtml(m.nom_mat) + '</option>';
-    });
-    sel.style.display = '';
+
+    try {
+        const resp = await fetch('index.php?action=ajax_matiere', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'idPromo=' + encodeURIComponent(idPromo)
+        });
+        const data = await resp.json();
+
+        sel.innerHTML = '<option value="">-- Matière --</option>';
+        data.forEach(m => {
+            sel.innerHTML += '<option value="' + m.id_mat + '">' + escHtml(m.nom_mat) + '</option>';
+        });
+        sel.style.display = '';
+    } catch (e) {
+        sel.innerHTML = '<option value="">-- Matière --</option>';
+        sel.style.display = 'none';
+        alert('Impossible de charger les matières pour cette promotion.');
+    }
+
     sel.onchange = affBtn;
+    updateSubmitState();
 }
 
 function affBtn() {
@@ -50,6 +99,7 @@ function affBtn() {
     } else {
         btn.style.display = 'none';
     }
+    updateSubmitState();
 }
 
 async function recupCombi() {
@@ -58,20 +108,28 @@ async function recupCombi() {
     const idSalle = document.getElementById('sel_salle').value;
     const idMat = document.getElementById('sel_matiere').value;
 
-    const resp = await fetch('index.php?action=ajax_add_combi', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'idPromo=' + encodeURIComponent(idPromo)
-            + '&idGroupe=' + encodeURIComponent(idGroupe)
-            + '&idSalle=' + encodeURIComponent(idSalle)
-            + '&idMat=' + encodeURIComponent(idMat)
-    });
-    const data = await resp.json();
+    try {
+        const resp = await fetch('index.php?action=ajax_add_combi', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'idPromo=' + encodeURIComponent(idPromo)
+                + '&idGroupe=' + encodeURIComponent(idGroupe)
+                + '&idSalle=' + encodeURIComponent(idSalle)
+                + '&idMat=' + encodeURIComponent(idMat)
+        });
+        const data = await resp.json();
 
-    if (!data.ok) {
-        alert(data.message || 'Erreur lors de l\'ajout.');
+        if (!data.ok) {
+            alert(data.message || 'Erreur lors de l\'ajout.');
+            renderCombi(data.combinaisons || []);
+            return false;
+        }
+        renderCombi(data.combinaisons || []);
+        return true;
+    } catch (e) {
+        alert('Erreur réseau lors de l\'ajout de la combinaison.');
+        return false;
     }
-    renderCombi(data.combinaisons || []);
 }
 
 async function supprCombi(index) {
@@ -85,10 +143,11 @@ async function supprCombi(index) {
 }
 
 function renderCombi(combinaisons) {
+    combinaisonsCourantes = combinaisons;
     const div = document.getElementById('tabRecap');
     if (!combinaisons.length) {
         div.innerHTML = '';
-        document.getElementById('btnSuivant').disabled = true;
+        updateSubmitState();
         return;
     }
     let html = '<table><tr><th>Promo/Groupe</th><th>Salle</th><th>Matière</th><th>Étudiants</th><th></th></tr>';
@@ -103,7 +162,7 @@ function renderCombi(combinaisons) {
     });
     html += '</table>';
     div.innerHTML = html;
-    document.getElementById('btnSuivant').disabled = false;
+    updateSubmitState();
 }
 
 function escHtml(str) {
@@ -116,7 +175,38 @@ function escHtml(str) {
 
 // Load existing combinaisons on page load
 (async function () {
-    const resp = await fetch('index.php?action=ajax_affiche_combi', {method: 'POST'});
-    const data = await resp.json();
-    renderCombi(data.combinaisons || []);
+    try {
+        const resp = await fetch('index.php?action=ajax_affiche_combi', {method: 'POST'});
+        const data = await resp.json();
+        renderCombi(data.combinaisons || []);
+    } catch (e) {
+        renderCombi([]);
+    }
 })();
+
+document.getElementById('formStage1')?.addEventListener('submit', async function (e) {
+    // Si aucune combinaison n'est encore ajoutée, on tente d'ajouter
+    // automatiquement la sélection courante avant de passer à l'étape 2.
+    if (combinaisonsCourantes.length === 0 && selectionCombiComplete()) {
+        e.preventDefault();
+        const ok = await recupCombi();
+        if (ok) {
+            this.submit();
+        }
+        return;
+    }
+    if (combinaisonsCourantes.length === 0) {
+        e.preventDefault();
+        alert('Ajoutez au moins une combinaison avant de continuer.');
+    }
+});
+
+['date_devoir', 'heure_debut', 'duree', 'sel_salle', 'sel_promo', 'sel_groupe', 'sel_matiere'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('change', updateSubmitState);
+        el.addEventListener('input', updateSubmitState);
+    }
+});
+
+updateSubmitState();
