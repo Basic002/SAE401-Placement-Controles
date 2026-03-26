@@ -32,7 +32,6 @@ class EnseignantsPdf extends FPDF
 $stmt = $pdo->query(
     'SELECT nom_ens, prenom_ens, login
        FROM enseignant
-      WHERE admin = 0
       ORDER BY nom_ens ASC, prenom_ens ASC'
 );
 $enseignants = $stmt->fetchAll(PDO::FETCH_ASSOC);

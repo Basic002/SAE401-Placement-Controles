@@ -21,7 +21,7 @@ class GroupeModel
     public static function findByPromo(PDO $pdo, int $idPromo): array
     {
         $stmt = $pdo->prepare(
-            'SELECT id_groupe, nom_groupe, id_promo, nb_etud
+            'SELECT id_groupe, nom_groupe, id_promo
                FROM groupe
               WHERE id_promo = :id_promo
               ORDER BY nom_groupe ASC'
