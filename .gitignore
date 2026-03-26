@@ -1,6 +1,8 @@
 # Fichiers de configuration sensibles - exclus du dépôt
 .env
 config/connexion.php
+placement_ancien/
+generer_mdp.php
 
 # Logs
 *.log

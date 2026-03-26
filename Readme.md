@@ -5,6 +5,10 @@ Ce projet a pour objectif la refonte, l'optimisation et le développement de l'a
 
 ---
 
+  * **Rapport final :** `RAPPORT semaine/finale/rapport_sae401.pdf` *(à venir)*
+
+---
+
 ## LIEN DevWeb
 
 L'application est actuellement déployée et accessible en ligne sur le serveur de l'IUT. 
@@ -35,7 +39,7 @@ Ce dépôt est organisé en plusieurs répertoires distincts correspondant aux d
 * **`Rapport analyse/`** * Contient notre rapport d'analyse initial.
   * Il détaille l'étude de l'existant, l'identification des anomalies (violation des formes normales) et nos choix d'architecture technique et logicielle.
 
-* **`Rapport semaine/`** * Regroupe les comptes-rendus de nos sprints hebdomadaires.
+* **`RAPPORT semaine/`** * Regroupe les comptes-rendus de nos sprints hebdomadaires.
   * Permet de suivre l'évolution du projet, la répartition des tâches et la gestion des obstacles rencontrés au fil des semaines.
 
 ---
