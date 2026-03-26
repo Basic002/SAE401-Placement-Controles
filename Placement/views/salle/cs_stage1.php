@@ -8,22 +8,50 @@
         <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="index.php?action=crea_salle&etape=1">
+    <div>
 
         <div class="champ">
-            <label for="nom_salle">Nom de la salle</label>
+            <label for="nomSalle">Nom de la salle</label>
             <input
                 type="text"
-                id="nom_salle"
+                id="nomSalle"
                 name="nom_salle"
                 required
                 value="<?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
             >
+            <span class="tooltip">Le nom doit avoir au moins 2 caractères</span>
         </div>
 
         <div class="champ">
-            <label for="etage">Étage</label>
-            <select id="etage" name="etage">
+            <label for="nbRang">Nombre de rangs</label>
+            <input
+                type="number"
+                id="nbRang"
+                name="nbRang"
+                min="2"
+                max="29"
+                value="<?php echo htmlspecialchars($sessionSalle['nbRang'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+            >
+            <span class="tooltip">Entre 2 et 29</span>
+        </div>
+
+        <div class="champ">
+            <label for="nbCol">Nombre de colonnes</label>
+            <input
+                type="number"
+                id="nbCol"
+                name="nbCol"
+                min="2"
+                max="29"
+                value="<?php echo htmlspecialchars($sessionSalle['nbCol'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+            >
+            <span class="tooltip">Entre 2 et 29</span>
+        </div>
+
+        <div class="champ">
+            <label for="etageSalle">Étage</label>
+            <select id="etageSalle" name="etage">
+                <option value="A">— Choisir —</option>
                 <?php
                 $etageActuel = $sessionSalle['etage'] ?? '';
                 $etages = [
@@ -41,12 +69,13 @@
                     </option>
                 <?php endforeach; ?>
             </select>
+            <span class="tooltip">Sélectionnez un étage</span>
         </div>
 
         <div class="champ">
-            <label for="id_bat">Bâtiment</label>
-            <select id="id_bat" name="id_bat">
-                <option value="">— Choisir —</option>
+            <label for="batSalle">Bâtiment</label>
+            <select id="batSalle" name="id_bat">
+                <option value="A">— Choisir —</option>
                 <?php foreach ($batiments as $bat):
                     $selected = ((string)($sessionSalle['id_bat'] ?? '') === (string)$bat['id_bat']) ? ' selected' : '';
                 ?>
@@ -55,12 +84,13 @@
                     </option>
                 <?php endforeach; ?>
             </select>
+            <span class="tooltip">Sélectionnez un bâtiment</span>
         </div>
 
         <div class="champ">
-            <label for="id_dpt">Département</label>
-            <select id="id_dpt" name="id_dpt">
-                <option value="">— Choisir —</option>
+            <label for="dptSalle">Département</label>
+            <select id="dptSalle" name="id_dpt">
+                <option value="A">— Choisir —</option>
                 <?php foreach ($departements as $dpt):
                     $selected = ((string)($sessionSalle['id_dpt'] ?? '') === (string)$dpt['id_dpt']) ? ' selected' : '';
                 ?>
@@ -69,28 +99,9 @@
                     </option>
                 <?php endforeach; ?>
             </select>
+            <span class="tooltip">Sélectionnez un département</span>
         </div>
 
-        <div class="champ">
-            <label for="intercal">Intercalaire</label>
-            <select id="intercal" name="intercal">
-                <?php
-                $intercalActuel = $sessionSalle['intercal'] ?? 1;
-                $intercalOptions = [1 => 'Oui', 0 => 'Non'];
-                foreach ($intercalOptions as $val => $libelle):
-                    $selected = ((string)$intercalActuel === (string)$val) ? ' selected' : '';
-                ?>
-                    <option value="<?php echo htmlspecialchars((string)$val, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $selected; ?>>
-                        <?php echo htmlspecialchars($libelle, ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <div class="actions">
-            <button type="submit">Suivant →</button>
-        </div>
-
-    </form>
+    </div>
 
 </div>

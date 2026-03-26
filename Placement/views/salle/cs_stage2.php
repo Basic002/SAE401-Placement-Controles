@@ -10,13 +10,13 @@
         <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="index.php?action=crea_salle&etape=2">
+    <div>
 
         <div class="champ">
-            <label for="nb_col">Nombre de colonnes</label>
+            <label for="nbCol">Nombre de colonnes</label>
             <input
                 type="number"
-                id="nb_col"
+                id="nbCol"
                 name="nb_col"
                 min="1"
                 max="20"
@@ -26,10 +26,10 @@
         </div>
 
         <div class="champ">
-            <label for="nb_rang">Nombre de rangs</label>
+            <label for="nbRang">Nombre de rangs</label>
             <input
                 type="number"
-                id="nb_rang"
+                id="nbRang"
                 name="nb_rang"
                 min="1"
                 max="20"
@@ -38,11 +38,6 @@
             >
         </div>
 
-        <div class="actions">
-            <a href="index.php?action=crea_salle&etape=1">← Retour</a>
-            <button type="submit">Suivant →</button>
-        </div>
-
-    </form>
+    </div>
 
 </div>

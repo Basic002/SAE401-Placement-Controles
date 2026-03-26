@@ -265,7 +265,9 @@ btnnext.addEventListener('click', function(e) {
 		case "stage2": 	loadStage("cs_stage3.php", "stage3");
 						break;
 						
-		case "stage3": 	loadStage("cs_stage4.php", "stage4");
+		case "stage3": 	var donnee = buildDonnee();
+						var url = "cs_stage4.php?donnee="+encodeURIComponent(donnee);
+						loadStage(url, "stage4");
 						break;
 						
 		default: 		break;
