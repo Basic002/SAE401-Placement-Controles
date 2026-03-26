@@ -1,6 +1,3 @@
-var myFrame=window.top.document.getElementById('myFrame');
-myFrame.style.height='200px';
-
 var chxBat=document.getElementById('batSalle');
 var chxDpt=document.getElementById('dptSalle');
 

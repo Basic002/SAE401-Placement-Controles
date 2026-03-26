@@ -45,14 +45,6 @@
 
     <div class="bureau">BUREAU</div>
 
-    <form method="POST" action="index.php?action=crea_salle&etape=3">
-        <input type="hidden" id="donnee" name="donnee" value="">
-        <div class="actions">
-            <a href="index.php?action=crea_salle&etape=2">← Retour</a>
-            <button type="submit">Suivant →</button>
-        </div>
-    </form>
-
 </div>
 
 <script src="public/javascript/crea_salle_s3.js"></script>

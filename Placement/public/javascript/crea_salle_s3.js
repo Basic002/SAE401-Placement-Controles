@@ -52,7 +52,7 @@ function modifEtat(cell) {
  */
 function buildDonnee() {
     var table = document.getElementById('TAB1');
-    if (!table) { return; }
+    if (!table) { return ''; }
 
     var result = '';
     var rows = table.rows;
@@ -67,13 +67,5 @@ function buildDonnee() {
         result += '-';
     }
 
-    var input = document.getElementById('donnee');
-    if (input) {
-        input.value = result;
-    }
+    return result;
 }
-
-/* On form submit, build donnee before the form is sent. */
-document.querySelector('form').addEventListener('submit', function(e) {
-    buildDonnee();
-});

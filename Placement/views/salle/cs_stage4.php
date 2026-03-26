@@ -45,11 +45,8 @@ function cellClass($val) {
 
     <div class="bureau">BUREAU</div>
 
-    <form method="POST" action="index.php?action=crea_salle&etape=4">
-        <div class="actions">
-            <a href="index.php?action=crea_salle&etape=3">← Retour</a>
-            <button type="submit">Enregistrer</button>
-        </div>
+    <form method="POST" action="index.php?action=crea_salle&etape=4" id="formSave">
+        <input type="hidden" id="donnee" name="donnee" value="<?php echo htmlspecialchars($sessionSalle['donnee'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </form>
 
 </div>
