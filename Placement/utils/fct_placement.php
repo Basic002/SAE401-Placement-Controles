@@ -119,17 +119,10 @@
 	*	@param $idGroup, le groupe à chercher
 	*/
 	function donneNombreEtudiant($idPromo, $idGroup){
-include('../connexion.php');
-		$nbEtudiant=0;
-		if($idGroup==0){
-			$stmt = $pdo->prepare('SELECT COUNT(*) a FROM etudiant, groupe WHERE etudiant.id_groupe=groupe.id_groupe AND id_promo= :idPromo');
-			$stmt->execute(['idPromo' => $idPromo]);
-		}else{
-			$stmt = $pdo->prepare('SELECT COUNT(*) a FROM etudiant, groupe WHERE etudiant.id_groupe=groupe.id_groupe AND groupe.id_groupe= :idGroup');
-			$stmt->execute(['idGroup' => $idGroup]);
-		}
-		
-		return $stmt->fetch(PDO::FETCH_ASSOC)['a'];//mysql_result($nbEtudiant,0);
+        global $pdo;
+        require_once __DIR__ . '/../models/EtudiantModel.php';
+        
+		return EtudiantModel::countByPromoOrGroup($pdo, $idPromo, $idGroup);
 	}
 
 	/**
@@ -239,13 +232,12 @@ include('../connexion.php');
 		}
 
 		if(isset($idEtud)){
-include('../connexion.php');
+            global $pdo;
+            require_once __DIR__ . '/../models/EtudiantModel.php';
 
-			$stmt=$pdo->prepare('SELECT nom_etudiant, prenom_etudiant FROM etudiant WHERE id_etudiant= :idEtud');
-			$stmt->execute(['idEtud' => $idEtud]);
-			$res=$stmt->fetch(PDO::FETCH_ASSOC);	
-			//$res=mysql_fetch_array($query);
-			if($res['nom_etudiant']!='')
+            $res = EtudiantModel::getNomPrenomById($pdo, $idEtud);
+			
+			if($res && $res['nom_etudiant']!='')
 			{
 				return '<b>'.$res['nom_etudiant'].' '.substr($res['prenom_etudiant'],0,1).'.</b>';
 			}
@@ -272,28 +264,14 @@ include('../connexion.php');
 	// ########################################## Recuperation structure salle ###########################################
 	function recupStructSalle($idSalle, $w)
 	{
-include('../connexion.php');
+        global $pdo;
+        require_once __DIR__ . '/../models/SalleModel.php';
 
-// Préparer la requête SQL avec une requête préparée
-$stmt = $pdo->prepare('SELECT * FROM plan, salle WHERE plan.id_plan = salle.id_plan AND id_salle = :idSalle');
-
-// Exécuter la requête en passant la valeur de $idSalle
-$stmt->execute(['idSalle' => $idSalle]);
-
-// Récupérer une ligne de résultat
-$salle = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// Récupérer la donnée du plan
-$text = $salle['donnee'];
-
-		// Requete
-//		$salle=mysql_query('SELECT * FROM plan, salle WHERE plan.id_plan=salle.id_plan AND id_salle=\''.$idSalle.'\'');
-		
-		// Recupere donnees plan
-//		$text=mysql_result($salle, 0, 'donnee');
+        // Appel au modèle
+        $salle = SalleModel::getPlanBySalleId($pdo, $idSalle);
+        $text = $salle['donnee'];
 		
 		// Separe les rangs dans un tableau
-		//$array=split('-',$text);
 		$array=explode('-',$text);
 	
 		// Recupere le nombre de colonnes et rangs
@@ -334,12 +312,6 @@ $text = $salle['donnee'];
 		$_SESSION['nbPU']=0;
 		// Nombre de place handicape
 		$_SESSION['nbPH']=0;
-
-		
-
-		// Declarations des tableaux 2 dimensions
-		//$_SESSION['placeUtil']=array(array(array()));
-		//$_SESSION['placeHandi']=array(array(array()));
 		
 		$idCol = getAvailableColumns($currentGroup, 0, $val);
 		getAvailableSeatsForStudents($currentGroup, $idCol);	
@@ -520,77 +492,54 @@ $text = $salle['donnee'];
 	}
 	
 	
-	/**
-	*	Fonction de placement des élèves dans la salle d'examen
-	*	Parcours itératif des étudiants pour les affecter à une place
-	*	On mélange les identifiants des étudiants pour ensuite les placer dans l'ordre dans la salle
-	*/
-	function placementEtud($w)
-	{	
-		// Melange du tableau des id etudiant
-		shuffle($_SESSION['etudUtil'][$w]);
+    /**
+    * Fonction de placement des élèves dans la salle d'examen
+    * Parcours itératif des étudiants pour les affecter à une place
+    * Délégué au Contrôleur pour respecter l'architecture MVC et les nouvelles contraintes BDD.
+    */
+    function placementEtud($w)
+    {   
+        global $pdo;
+        require_once __DIR__ . '/../controllers/PlacementController.php';
+        require_once __DIR__ . '/../models/EtudiantModel.php';
+        require_once __DIR__ . '/../models/SalleModel.php';
+        
+        //Récupération des données d'entrée depuis $_SESSION['infoCombi']
+        $idPromo = $_SESSION['infoCombi'][$w][0];
+        $idGroupe = $_SESSION['infoCombi'][$w][1];
+        $idSalle = $_SESSION['infoCombi'][$w][2];
+        
+        //Récupérer les identifiants
+        $ids_etudiants = EtudiantModel::getIdsByPromoOrGroup($pdo, $idPromo, $idGroupe);
+        
+        //Gérer l'espacement (intercal=1 => une place sur deux (step=2), intercal=0 => step=1)
+        $salleData = SalleModel::getPlanBySalleId($pdo, $idSalle);
+        $step = ($salleData['intercal'] == 1) ? 2 : 1;
 
-		for($i=0; $i<$_SESSION['nbEtud'][$w]; $i++)
-		{
-			// ### Affectation des "nbEtud" premieres places ###
-			$_SESSION['placement'][$w][$i][0]=$_SESSION['placeUtil'][$w][$i][0];
-			$_SESSION['placement'][$w][$i][1]=$_SESSION['placeUtil'][$w][$i][1];
-	
-			// ########## Affectation de l'idEtudiant ##########
-			$_SESSION['placement'][$w][$i][2]=$_SESSION['etudUtil'][$w][$i];
-		}
-	}
+        //Appel propre au Contrôleur
+        $resultatPlacement = PlacementController::calculerPlacement($pdo, $idSalle, $ids_etudiants, $step);
+        
+        //On assigne uniquement le résultat final (nécessaire pour l'affichage des PDF/vues par la suite)
+        $_SESSION['placement'][$w] = $resultatPlacement;
+        
+        //Nettoyage des vieilles variables de session inutiles si elles existaient
+        unset($_SESSION['placeUtil'], $_SESSION['placeHandi'], $_SESSION['structSalle'], $_SESSION['etudUtil']);
+    }
 	
 	// ############################################# Recup liste d'etudiants ############################################
 	function recupEtud($i, $w)
 	{	
-include('../connexion.php');
+        global $pdo;
+        require_once __DIR__ . '/../models/EtudiantModel.php';
 
-if ($_SESSION['infoCombi'][$i][1] == '0') {
-    $stmt = $pdo->prepare('SELECT id_etudiant 
-        FROM etudiant, groupe 
-        WHERE etudiant.id_groupe = groupe.id_groupe 
-        AND id_promo = :idPromo');
-    
-    $stmt->execute(['idPromo' => $_SESSION['infoCombi'][$i][0]]);
-} else {
-    $stmt = $pdo->prepare('SELECT id_etudiant 
-        FROM etudiant, groupe 
-        WHERE etudiant.id_groupe = groupe.id_groupe 
-        AND groupe.id_groupe = :idGroupe');
-    
-    $stmt->execute(['idGroupe' => $_SESSION['infoCombi'][$i][1]]);
-}
+        // Appel au modèle pour récupérer le tableau des IDs
+        $ids = EtudiantModel::getIdsByPromoOrGroup($pdo, $_SESSION['infoCombi'][$i][0], $_SESSION['infoCombi'][$i][1]);
 
-// Récupérer les résultats
-while ($value = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $_SESSION['etudUtil'][$w][$_SESSION['nbEtud'][$w]] = $value['id_etudiant'];
-    $_SESSION['nbEtud'][$w]++;
-}
-
-/*
-		if($_SESSION['infoCombi'][$i][1]=='0')
-		{
-			$query=mysql_query('SELECT id_etudiant 
-				FROM etudiant, groupe 
-				WHERE etudiant.id_groupe=groupe.id_groupe 
-				AND id_promo=\''.$_SESSION['infoCombi'][$i][0].'\'')  or die('Erreur SQL !'.$req.'<br>'.mysql_error());
-		}
-		else
-		{
-			$query=mysql_query('SELECT id_etudiant 
-				FROM etudiant, groupe 
-				WHERE etudiant.id_groupe=groupe.id_groupe 
-				AND groupe.id_groupe=\''.$_SESSION['infoCombi'][$i][1].'\'')  or die('Erreur SQL !'.$req.'<br>'.mysql_error());
-		}
-		
-		
-		while($value=mysql_fetch_array($query))
-		{
-			$_SESSION['etudUtil'][$w][$_SESSION['nbEtud'][$w]]=$value['id_etudiant'];
-			$_SESSION['nbEtud'][$w]++;
-		}
-*/
+        // Peuplement du tableau de session
+        foreach ($ids as $id_etudiant) {
+            $_SESSION['etudUtil'][$w][$_SESSION['nbEtud'][$w]] = $id_etudiant;
+            $_SESSION['nbEtud'][$w]++;
+        }
 	}
 	
 	/**
