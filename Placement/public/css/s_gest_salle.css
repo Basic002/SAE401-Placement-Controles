@@ -1,5 +1,190 @@
-#myFrame
-{
-	height: auto;
-	width: 950px;
+/* ================ ACTIONS HEADER ================ */
+.actions-header {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.btn-action {
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #2196F3;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #0b7dda;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* ================ TABLEAU ================ */
+.tableau-salles {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.tableau-salles thead {
+    background-color: #333;
+    color: white;
+    font-weight: 600;
+}
+
+.tableau-salles thead th {
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tableau-salles tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+.tableau-salles tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.tableau-salles tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tableau-salles tbody td {
+    padding: 12px 15px;
+    font-size: 14px;
+}
+
+/* ================ COLONNES ================ */
+.col-nom {
+    width: 20%;
+    font-weight: 600;
+    color: #333;
+}
+
+.col-bat {
+    width: 20%;
+}
+
+.col-etage {
+    width: 12%;
+    text-align: center;
+}
+
+.col-dpt {
+    width: 18%;
+}
+
+.col-cap {
+    width: 15%;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.col-actions {
+    width: 10%;
+    text-align: center;
+}
+
+/* ================ BOUTONS D'ACTION ================ */
+.btn-view {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-view:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+}
+
+/* ================ NO DATA ================ */
+.no-data {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    color: #666;
+}
+
+.no-data p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* ================ RESPONSIVE ================ */
+@media (max-width: 768px) {
+    .actions-header {
+        flex-direction: column;
+    }
+
+    .btn-action {
+        width: 100%;
+        text-align: center;
+    }
+
+    .tableau-salles {
+        font-size: 12px;
+    }
+
+    .tableau-salles thead th,
+    .tableau-salles tbody td {
+        padding: 10px;
+    }
+
+    .col-nom {
+        width: 25%;
+    }
+
+    .col-bat {
+        width: 25%;
+    }
+
+    .col-etage {
+        width: 15%;
+    }
+
+    .col-dpt {
+        display: none;
+    }
+
+    .col-cap {
+        width: 20%;
+    }
+
+    .col-actions {
+        width: 15%;
+    }
 }
