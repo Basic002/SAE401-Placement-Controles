@@ -112,8 +112,8 @@ class SalleController extends Controller
                 $data['etage'],
                 $data['id_bat'],
                 $data['id_dpt'],
-                $data['donnee'],
-                $data['capacite'],
+                $data['donnee'] ?? '',
+                $data['capacite'] ?? 0,
                 $data['intercal']
             );
             unset($_SESSION['cs_salle']);
@@ -132,6 +132,14 @@ class SalleController extends Controller
             3 => 'salle/cs_stage3.php',
             4 => 'salle/cs_stage4.php',
         ];
+
+        // Si c'est une requête AJAX, retourner juste le contenu du stage
+        if (!empty($_GET['ajax'])) {
+            ob_start();
+            include __DIR__ . '/../views/' . $vues[$etape];
+            echo ob_get_clean();
+            return;
+        }
 
         $this->render('salle/crea_salle.php', "Créer une salle — Étape {$etape}", [
             'etape'        => $etape,

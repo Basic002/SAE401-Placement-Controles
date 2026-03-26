@@ -6,14 +6,6 @@ var btnbef=document.getElementById('btnbef');
 var btnnext=document.getElementById('btnnext');
 var btnsave=document.getElementById('btnsave');
 
-var PATH_PREFIX = "views/salle/"; // Chemin relatif depuis la racine (index.php)
-
-function recupVar()
-{
-    // Fonctionnalité intégrée directement lors du changement d'étape si nécessaire
-}
-
-
 function getTooltip(element)
 {
     while (element=element.nextSibling)
@@ -172,14 +164,10 @@ function executeScripts(container) {
     });
 }
 
-function loadStage(url, stageName) {
-    var fetchUrl = url;
-    // Si l'URL ne commence pas par le prefixe, on l'ajoute
-    if (fetchUrl.indexOf(PATH_PREFIX) === -1) {
-        fetchUrl = PATH_PREFIX + fetchUrl;
-    }
+function loadStage(stageName, etapeNum) {
+    var url = 'index.php?action=crea_salle&etape=' + etapeNum + '&ajax=1';
 
-    fetch(fetchUrl)
+    fetch(url)
         .then(response => response.text())
         .then(html => {
             stageContainer.innerHTML = html;
@@ -193,27 +181,6 @@ function loadStage(url, stageName) {
         });
 }
 
-// Interception des liens internes (ex: ajout lignes/colonnes étape 2)
-stageContainer.addEventListener('click', function(e) {
-    var target = e.target.closest('a');
-    if (target) {
-        var href = target.getAttribute('href');
-        // Si le lien pointe vers une étape php (gestion dynamique interne)
-        if (href && href.indexOf('cs_stage') !== -1) {
-            e.preventDefault();
-            // On détermine le stageName basé sur le fichier php cible
-            var newStageName = currentStageInput.value;
-            if (href.indexOf('cs_stage1.php') !== -1) newStageName = 'stage1';
-            else if (href.indexOf('cs_stage2.php') !== -1) newStageName = 'stage2';
-            else if (href.indexOf('cs_stage3.php') !== -1) newStageName = 'stage3';
-            else if (href.indexOf('cs_stage4.php') !== -1) newStageName = 'stage4';
-            
-            loadStage(href, newStageName);
-        }
-    }
-});
-
-
 // #### Gestion Navigation ####
 
 
@@ -223,13 +190,13 @@ btnbef.addEventListener('click', function(e) {
 
 	switch(stage)
 	{
-		case "stage2": 	loadStage("cs_stage1.php", "stage1");
+		case "stage2": 	loadStage("stage1", 1);
 						break;
 						
-		case "stage3":	loadStage("cs_stage2.php", "stage2");
+		case "stage3":	loadStage("stage2", 2);
 						break;
 						 
-		case "stage4":	loadStage("cs_stage3.php", "stage3");
+		case "stage4":	loadStage("stage3", 3);
 						break;
 						
 		default: 		break;
@@ -253,7 +220,7 @@ btnnext.addEventListener('click', function(e) {
 							})
 							.then(response => {
 								if (response.ok) {
-									loadStage("cs_stage2.php", "stage2");
+									loadStage("stage2", 2);
 								} else {
 									console.error('Erreur validation stage 1');
 								}
@@ -271,7 +238,7 @@ btnnext.addEventListener('click', function(e) {
 						})
 						.then(response => {
 							if (response.ok) {
-								loadStage("cs_stage3.php", "stage3");
+								loadStage("stage3", 3);
 							} else {
 								console.error('Erreur validation stage 2');
 							}
@@ -290,7 +257,7 @@ btnnext.addEventListener('click', function(e) {
 						})
 						.then(response => {
 							if (response.ok) {
-								loadStage("cs_stage4.php", "stage4");
+								loadStage("stage4", 4);
 							} else {
 								console.error('Erreur validation stage 3');
 							}
