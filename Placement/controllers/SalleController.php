@@ -133,12 +133,13 @@ class SalleController extends Controller
             4 => 'salle/cs_stage4.php',
         ];
 
-        $this->render($vues[$etape], "Créer une salle — Étape {$etape}", [
+        $this->render('salle/crea_salle.php', "Créer une salle — Étape {$etape}", [
             'etape'        => $etape,
             'batiments'    => $batiments,
             'departements' => $departements,
             'sessionSalle' => $sessionSalle,
             'erreur'       => $erreur,
+            'stageFile'    => $vues[$etape],
         ]);
     }
 

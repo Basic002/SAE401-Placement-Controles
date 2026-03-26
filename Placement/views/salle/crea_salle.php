@@ -16,9 +16,13 @@
 
 	<!-- iFrame pour faire defiler les etapes (REMPLACÉ PAR DIV) -->
 	<div id="stage-content">
-		<?php include "cs_stage1.php"; ?>
+		<?php 
+		if (!empty($stageFile)) {
+			include __DIR__ . '/' . basename($stageFile);
+		}
+		?>
 	</div>
-	<input type="hidden" id="currentStageName" value="stage1">
+	<input type="hidden" id="currentStageName" value="stage<?php echo htmlspecialchars((string)($etape ?? 1), ENT_QUOTES, 'UTF-8'); ?>">
 
 	<!-- Bouton precedent/suivant -->
 	<button type="button" id="btnbef" style="display:none; float:left; margin-left:20px;">Précédent</button>
