@@ -1,61 +1,58 @@
-<?php
-	session_start();
-	
-	// ################# Modifie la classe pour l'affichage ##################
-	function modifClasse($val)
-	{
-		switch ($val)
-		{
-			case 0: $classe='couloir'; break;
-			case 1: $classe='placeOk'; break;
-			case 2: $classe='placeHandi'; break;
-			case 3: $classe='placeInex'; break;
-			default: break;
-		}
-		return $classe;
-	}
-	
-?>
+<link rel="stylesheet" href="public/css/s_stage3.css">
 
-<!-- ################################################################################################ -->
-<!-- ########################################## CORPS PAGE ########################################## -->
-<!-- ################################################################################################ -->
+<div class="titrecontenu">Créer une salle — Étape 3</div>
 
-<!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_stage3.css">
+<div class="contenu">
 
-<!-- ######################### Titre ######################## -->
-<center><h1>&Eacute;tape 3 : Mod&eacute;lisation places</h1></center>
+    <?php if (!empty($erreur)): ?>
+        <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
 
-<center>
+    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? '', ENT_QUOTES, 'UTF-8'); ?></h3>
 
-	<!-- #################### Choix action ################## -->
-	<form>
-		<input type="radio" name="choixEtat" id="delPlace" checked="true" >Supprimer place</input>
-		<input type="radio" name="choixEtat" id="addPlace">Ajouter place</input>
-		<input type="radio" name="choixEtat" id="handiPlace">Place 'handicap&eacute;'</input>
-	</form>
+    <div class="radio-groupe">
+        <label>
+            <input type="radio" name="choixEtat" id="radio_couloir" value="0">
+            Couloir
+        </label>
+        <label>
+            <input type="radio" name="choixEtat" id="radio_placeOk" value="1" checked>
+            Place normale
+        </label>
+        <label>
+            <input type="radio" name="choixEtat" id="radio_handi" value="2">
+            Place PMR
+        </label>
+        <label>
+            <input type="radio" name="choixEtat" id="radio_inex" value="3">
+            Place inexistante
+        </label>
+    </div>
 
-	<!-- ############ Affichage structure salle ############# -->
-	<table id="TAB1">
-		<?php
-			for($i=0; $i<$_SESSION['rangSalle']; $i++)
-			{
-				echo '<tr id="'.$i.'">';
-		
-				for($j=0; $j<$_SESSION['colSalle']; $j++)
-				{
-					echo '<td class="'.modifClasse($_SESSION['structSalle'][$i][$j]).'" id="'.$i.'-'.$j.'" onclick="modifEtat(this.id, this.className)"></td>';	
-				}
-				echo '</tr>';
-				
-			}
-		?>
-	</table>
-	
-</center>
+    <table id="TAB1">
+        <?php
+        $nbRang = (int)($sessionSalle['nb_rang'] ?? 0);
+        $nbCol  = (int)($sessionSalle['nb_col']  ?? 0);
+        for ($i = 0; $i < $nbRang; $i++):
+        ?>
+            <tr id="<?php echo $i; ?>">
+                <?php for ($j = 0; $j < $nbCol; $j++): ?>
+                    <td id="<?php echo $i . '-' . $j; ?>" class="placeOk" onclick="modifEtat(this)"></td>
+                <?php endfor; ?>
+            </tr>
+        <?php endfor; ?>
+    </table>
 
-<br><center><div class="bureau">BUREAU</div></center>
+    <div class="bureau">BUREAU</div>
 
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/crea_salle_s3.js"></script>
+    <form method="POST" action="index.php?action=crea_salle&etape=3">
+        <input type="hidden" id="donnee" name="donnee" value="">
+        <div class="actions">
+            <a href="index.php?action=crea_salle&etape=2">← Retour</a>
+            <button type="submit">Suivant →</button>
+        </div>
+    </form>
+
+</div>
+
+<script src="public/javascript/crea_salle_s3.js"></script>

@@ -1,0 +1,28 @@
+# ============================================================
+# Sécurité : interdire l'accès HTTP direct aux dossiers
+# qui ne doivent jamais être exposés au navigateur.
+# Seul public/ est accessible directement.
+# ============================================================
+
+# Bloquer l'accès direct à config/, models/, controllers/, views/, utils/
+<IfModule mod_authz_core.c>
+    <DirectoryMatch "^.*(config|models|controllers|views|utils|scripts)($|/)">
+        Require all denied
+    </DirectoryMatch>
+</IfModule>
+
+# Option de réécriture (à activer si mod_rewrite disponible sur le serveur)
+# Actuellement non utilisé : le routeur fonctionne avec ?action=
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteBase /Placement/
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteRule ^(.*)$ index.php?action=$1 [QSA,L]
+# </IfModule>
+
+# Empêcher l'affichage du contenu des répertoires
+Options -Indexes
+
+# Désactiver l'exécution PHP dans le dossier d'upload (si applicable)
+# php_flag engine off

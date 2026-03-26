@@ -1,113 +1,66 @@
+var selectedCells = [];
 
-// Fonction d'interversion
+function selecTwo(cell) {
+    const etuId = cell.getAttribute('data-etu-id');
+    if (!etuId) return; // empty cell, skip
 
-var nbId=0;
-var tabId = [];
-var tabXY;
+    // If already selected, deselect
+    if (selectedCells.includes(cell)) {
+        cell.classList.remove('placeSelec');
+        selectedCells = selectedCells.filter(c => c !== cell);
+        if (selectedCells.length < 2) {
+            document.getElementById('btnInter').style.display = 'none';
+        }
+        return;
+    }
 
-var eleveA = [];
-var eleveAId;
-var eleveB = [];
+    if (selectedCells.length >= 2) {
+        // Reset all
+        selectedCells.forEach(c => {
+            c.classList.remove('placeSelec');
+        });
+        selectedCells = [];
+        document.getElementById('btnInter').style.display = 'none';
+    }
 
-/**
-*	Fait disparaitre le bouton intervertir, relâche les cases sélectionnées et reset les données
-*/
-function resetSwitch(){
-	const btnInter=document.getElementById('btnInter');
-	document.getElementById(tabId[0]).className='placeOk';
-	document.getElementById(tabId[1]).className='placeOk';
-	btnInter.style.display='none';
-	nbId=0;
+    cell.classList.add('placeSelec');
+    selectedCells.push(cell);
+
+    if (selectedCells.length === 2) {
+        document.getElementById('btnInter').style.display = '';
+    }
 }
 
-/**
-*	Mise en mémoire des élèves sélectionnés pour intervertion.
-*	Si les deux places sont vides (taille <=10) alors on affiche un message d'erreur et
-*	on réinitialise
-*/
-function selecTwo(id,a,b)
-{	
-	const case1=document.getElementById(id);
-	
-	if(nbId>1){
-		resetSwitch();
-	}else{
-		if(case1.className=='placeOk' || case1.className=='placeHandi'){
-			tabId[nbId]=id;
-			case1.className='placeSelec';
-			nbId++;
-			if(nbId==1){
-				eleveA = [];
-				eleveA.push(a);
-				eleveA.push(b);
-				eleveAId = id;
-			}else if (nbId==2){
-				const contenuA = document.getElementById(eleveAId);
-				const contenuB = document.getElementById(id);
+async function intervertir() {
+    if (selectedCells.length !== 2) return;
 
-				if (contenuA.innerHTML.length <= 10 &&
-					contenuB.innerHTML.length <= 10){
+    const etu1 = selectedCells[0].getAttribute('data-etu-id');
+    const etu2 = selectedCells[1].getAttribute('data-etu-id');
 
-					alert("Il est impossible de déplacer deux places vides !");
-					resetSwitch();
-				}else{
+    const resp = await fetch('index.php?action=ajax_intervertir', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'etu1=' + encodeURIComponent(etu1) + '&etu2=' + encodeURIComponent(etu2)
+    });
+    const data = await resp.json();
 
-					eleveB = [];
-					eleveB.push(a);
-					eleveB.push(b);
-					
-				}
-			}
-			
-			
-			if(nbId==2){
-				const btnInter=document.getElementById('btnInter');
-				btnInter.style.display='';
-			}
-			
-		}
-	}
-	
-}
+    if (!data.ok) {
+        alert(data.message || 'Erreur lors de l\'interversion.');
+        return;
+    }
 
-/**
-*	Mise à jour de l'échange des deux élèves.
-*	On envoit les informations au serveur et si tout se passe bien (pas de données en retour), on inverse
-*	sinon on affiche le message reçu
-*/
-function intervertir()
-{
-	const salleConcernee = blocOnglet1.style.display===""?0:1;
-	console.log(salleConcernee)
-	$.post('ajaxIntervertion.php', {
-		utilSalle: salleConcernee,
-		utilAcol: eleveA[0],
-		utilAlin: eleveA[1],
-		utilBcol: eleveB[0],
-		utilBlin: eleveB[1]
-	}, function(data){
-		if(data){
-			console.log(data);
-			console.log(data.length);
-			alert(data);
-		}else{
-			const case0=document.getElementById(tabId[0]).innerHTML.split('<br>');
-			const case1=document.getElementById(tabId[1]).innerHTML.split('<br>');
-			document.getElementById(tabId[0]).innerHTML=case1[0]+'<br>'+case0[1];
-			document.getElementById(tabId[1]).innerHTML=case0[0]+'<br>'+case1[1];
-			
-			// Cache bouton
-			const btnInter=document.getElementById('btnInter');
-			btnInter.style.display='none';
-			
-			// Remise couleur classe
-			document.getElementById(tabId[0]).className='placeOk';
-			document.getElementById(tabId[1]).className='placeOk';
-			
-			resetSwitch();
-		}
-	});
-	
-	
+    // Swap DOM: swap innerHTML and data-etu-id between the two cells
+    const html0 = selectedCells[0].innerHTML;
+    const id0 = selectedCells[0].getAttribute('data-etu-id');
 
+    selectedCells[0].innerHTML = selectedCells[1].innerHTML;
+    selectedCells[0].setAttribute('data-etu-id', selectedCells[1].getAttribute('data-etu-id') || '');
+
+    selectedCells[1].innerHTML = html0;
+    selectedCells[1].setAttribute('data-etu-id', id0 || '');
+
+    // Reset selection
+    selectedCells.forEach(c => c.classList.remove('placeSelec'));
+    selectedCells = [];
+    document.getElementById('btnInter').style.display = 'none';
 }

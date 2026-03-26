@@ -1,145 +1,79 @@
 <?php
-	session_start();
-	
-	// ################# Recense nombre de place dans la salle ##################
-	function comptePlace()
-	{
-		$placeOk=0;
-		$placeHandi=0;
-		
-		for($i=0; $i<$_SESSION['rangSalle']; $i++)
-		{
-			for($j=0; $j<$_SESSION['colSalle']; $j++)
-			{
-				if($_SESSION['structSalle'][$i][$j]=='1')
-				{
-					$placeOk++;
-				}
-				else if($_SESSION['structSalle'][$i][$j]=='2')
-				{
-					$placeHandi++;
-				}
-			}
-		}
-		
-		$arrayPlace[0]=$placeOk;
-		$arrayPlace[1]=$placeHandi;
-		
-		return $arrayPlace;
-	}
-	
-	// ############## Sauvegarde du plance dans la base de donnee ##############
-	function saveBDD()
-	{
-		$text='';
-		
-		for($i=0; $i<$_SESSION['rangSalle']; $i++)
-		{
-			for($j=0; $j<$_SESSION['colSalle']; $j++)
-			{
-				$text.=$_SESSION['structSalle'][$i][$j];
-			}
-			$text.='-';
-		}
-		
-		include("connexion.php");
-		
-		// Modification du plan
-		$stmt = $pdo->prepare('UPDATE plan SET donnee = :donnee WHERE id_plan = :id_plan');
-		$stmt->execute(['donnee' => $text, 'id_plan' => $_SESSION['idPlan']]);
-		
-		// Modification de la salle
-		$capacite = comptePlace();
-		$_SESSION['capacite'] = $capacite[0] + $capacite[1];
-		
-		$stmt = $pdo->prepare('UPDATE salle SET nom_salle = :nom_salle, etage = :etage, id_bat = :id_bat, id_dpt = :id_dpt, capacite = :capacite WHERE id_plan = :id_plan');
-		$stmt->execute([
-			'nom_salle' => $_SESSION['nomSalle'],
-			'etage' => $_SESSION['etageSalle'],
-			'id_bat' => $_SESSION['batSalle'],
-			'id_dpt' => $_SESSION['dptSalle'],
-			'capacite' => $_SESSION['capacite'],
-			'id_plan' => $_SESSION['idPlan']
-		]);
-	}
-	
+$donnee     = $sessionSalle['donnee'] ?? '';
+$placeOk    = substr_count($donnee, '1');
+$placeHandi = substr_count($donnee, '2');
+$capacite   = $placeOk + $placeHandi;
 
-	
-	// ################# Modifie la classe pour l'affichage ##################
-	function modifClasse($val)
-	{
-		switch ($val)
-		{
-			case 0: $classe='couloir'; break;
-			case 1: $classe='placeOk'; break;
-			case 2: $classe='placeHandi'; break;
-			case 3: $classe='placeInex'; break;
-			default: break;
-		}
-		return $classe;
-	}
-	
-	// ################# Test l'appuie sur le bouton enregistrer #################
-	if(isset($_POST['Enregistrer']))
-	{
-		saveBDD();
-		// echo "<script>alert('Enregistrement effectue')</script>";
-		echo "<script>window.top.document.location.href='index.php?p=gest_salle'</script>";
-	}
+// Retrouve le nom du batiment depuis l'id
+$nomBat = '';
+foreach ($batiments as $bat) {
+    if ((int)$bat['id_bat'] === (int)($sessionSalle['id_bat'] ?? -1)) {
+        $nomBat = $bat['nom_bat'];
+        break;
+    }
+}
+
+// Retrouve le nom du departement depuis l'id
+$nomDpt = '';
+foreach ($departements as $dpt) {
+    if ((int)$dpt['id_dpt'] === (int)($sessionSalle['id_dpt'] ?? -1)) {
+        $nomDpt = $dpt['nom_dpt'];
+        break;
+    }
+}
+
+$etages = [0 => 'RDC', 1 => '1er', 2 => '2ème', 3 => '3ème', 4 => '4ème'];
+$etageLabel = $etages[(int)($sessionSalle['etage'] ?? 0)] ?? (string)($sessionSalle['etage'] ?? '');
 ?>
 
-<!-- ################################################################################################ -->
-<!-- ########################################## CORPS PAGE ########################################## -->
-<!-- ################################################################################################ -->
-
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_stage4.css">
+<link rel="stylesheet" type="text/css" href="public/css/s_stage4.css">
 
-<!-- ######################### Titre ######################## -->
-<center><h1>Modification : Récapitulatif</h1></center>
+<!-- #################### TITRE PRINCIPAL ################### -->
+<div class="titrecontenu">Modifier une salle — Étape 6</div>
 
-<!-- INFORMATIONS SALLE -->
-<center>
-	<?php
-		$array=comptePlace();
-		echo '<h3>'.$_SESSION['nomSalle'].'</h3>';
-		echo '<b>'.$array[0].'</b> places ';
-		if($array[1])
-		{
-			echo '(+ <b>'.$array[1].'</b> places "handicapé")';
-		}
-	?>
-</center>
+<!-- ##################### CONTENU PAGE ##################### -->
+<div class="contenu">
 
-<br>
+    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
 
-<!-- ################# Affichage structure ################## -->
-<center>
-	<table id="TAB1">
-		<?php
-			$nbRang=$_SESSION['rangSalle'];
-			$nbCol=$_SESSION['colSalle'];
-		
-			// Affichage structure salle
-			for($i=0; $i<$nbRang; $i++)
-			{
-				echo '<tr id="'.$i.'">';
-				for($j=0; $j<$nbCol; $j++)
-				{
-					echo '<td class="'.modifClasse($_SESSION['structSalle'][$i][$j]).'" id="'.$i.'-'.$j.'"></td>';	
-				}
-				echo '</tr>';
-			}
-		?>
-	</table> 
-</center>
+    <!-- RECAPITULATIF -->
+    <table class="recap">
+        <tr>
+            <th>Bâtiment</th>
+            <td><?php echo htmlspecialchars($nomBat); ?></td>
+        </tr>
+        <tr>
+            <th>Département</th>
+            <td><?php echo htmlspecialchars($nomDpt); ?></td>
+        </tr>
+        <tr>
+            <th>Étage</th>
+            <td><?php echo htmlspecialchars($etageLabel); ?></td>
+        </tr>
+        <tr>
+            <th>Intercalation</th>
+            <td><?php echo (int)($sessionSalle['intercal'] ?? 0) ? 'Oui' : 'Non'; ?></td>
+        </tr>
+        <tr>
+            <th>Capacité</th>
+            <td>
+                <?php echo $placeOk; ?> place<?php echo $placeOk > 1 ? 's' : ''; ?>
+                <?php if ($placeHandi > 0): ?>
+                (+ <?php echo $placeHandi; ?> place<?php echo $placeHandi > 1 ? 's' : ''; ?> PMR)
+                <?php endif; ?>
+            </td>
+        </tr>
+    </table>
 
-<!-- ################# Bouton enregistrement ################ -->
-<form id="formSave" name="formSave" action="ms_stage6.php" method="POST">
-	<input type="hidden" name="Enregistrer" value="Enregistrer">
-</form>
+    <!-- FORMULAIRE D'ENREGISTREMENT -->
+    <form method="POST" action="index.php?action=modif_salle&amp;etape=6">
 
-<br><center><div class="bureau">BUREAU</div></center>
+        <div class="champ-nav">
+            <a href="index.php?action=modif_salle&amp;etape=5" class="btn-retour">← Retour</a>
+            <button type="submit">Enregistrer</button>
+        </div>
 
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/crea_salle_s2.js"></script>
+    </form>
+
+</div>

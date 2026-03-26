@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : devbdd.iutmetz.univ-lorraine.fr
--- Généré le : ven. 20 mars 2026 à 15:46
+-- Généré le : jeu. 26 mars 2026 à 19:53
 -- Version du serveur : 10.3.39-MariaDB
 -- Version de PHP : 8.2.20
 
@@ -705,11 +705,11 @@ CREATE TABLE `enseignant` (
 --
 
 INSERT INTO `enseignant` (`id_ens`, `nom_ens`, `prenom_ens`, `sexe`, `login`, `pass`, `admin`) VALUES
-(3, 'Roka', 'Zsuzsanna', 'F', 'roka', NULL, 1),
+(3, 'Roka', 'Zsuzsanna', 'F', 'roka', '$2y$10$ZjGSHIYGWkcBB7CTMR2D6ujXxeWhg5MxYyD9Y0ZT84JA..vVTvkga', 1),
 (21, 'Spengler', 'Anne', 'F', 'spengler', NULL, 1),
 (31, 'Laroche', 'Pierre', 'M', 'laroche', NULL, 1),
 (36, 'info', 'info', 'M', 'info', NULL, 0),
-(40, 'Bougdira', 'Nathalie', 'F', 'bougnath', NULL, 0);
+(40, 'Bougdira', 'Nathalie', 'F', 'bougnath', '$2y$10$011xV8isV/lr3qJ38Er6He8XVtUL2..mDVPOfOAATcZtV4nVXjXD6', 0);
 
 -- --------------------------------------------------------
 

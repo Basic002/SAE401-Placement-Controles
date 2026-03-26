@@ -1,44 +1,40 @@
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_gest_salle.css">
+<link rel="stylesheet" type="text/css" href="public/css/s_gest_salle.css">
 
 <!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Salle</div>
+<div class="titrecontenu">Gestion des salles</div>
 
 <!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
 
-	<!-- BLOC AFFICHAGE LISTE SALLES -->
-	
-	<!-- iFrame pour faire defiler les etapes -->
-	<iframe id="myFrame" name="stage1" src="ms_stage1.php" scrolling="no" onload="affBtn()" style="border:none"></iframe>
-	
-	<!-- Bouton precedent/suivant -->
-	<button type="button" id="btnBef" style="display:none; float:left; margin-left:20px;">Précédent</button>
-	<button type="button" id="btnModif" style="display:none; float: right; margin-right: 20px;">Modifier</button>
-	<button type="button" id="btnNext" style="display:none; float: right; margin-right: 20px;">Suivant</button>
-	<button type="button" id="btnSave" style="display:none; float: right; margin-right: 20px;">Enregistrer</button>
-	<br>
+    <!-- BOUTONS D'ACTION -->
+    <div class="actions">
+        <a href="index.php?action=crea_salle" class="btn-action">Créer une salle</a>
+        <a href="index.php?action=modif_salle" class="btn-action">Modifier une salle</a>
+    </div>
+
+    <!-- ENTETE TABLEAU -->
+    <div class="ligne-entete">
+        <div class="col-nom">Nom</div>
+        <div class="col-bat">Bâtiment</div>
+        <div class="col-etage">Étage</div>
+        <div class="col-cap">Capacité</div>
+        <div class="col-actions">Actions</div>
+    </div>
+
+    <!-- LISTE DES SALLES -->
+    <?php foreach ($salles as $salle): ?>
+    <div class="ligne-salle">
+        <div class="col-nom"><?php echo htmlspecialchars($salle['nom_salle']); ?></div>
+        <div class="col-bat"><?php echo htmlspecialchars($salle['nom_bat']); ?></div>
+        <div class="col-etage"><?php echo htmlspecialchars($salle['etage']); ?></div>
+        <div class="col-cap"><?php echo htmlspecialchars($salle['capacite']); ?></div>
+        <div class="col-actions">
+            <a href="index.php?action=visu_salle&amp;id_salle=<?php echo (int)$salle['id_salle']; ?>">
+                <img src="public/images/loupe.png" alt="Visualiser" class="img-action">
+            </a>
+        </div>
+    </div>
+    <?php endforeach; ?>
+
 </div>
-
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/crea_salle.js"></script>
-<script src="javascript/modif_salle.js"></script>
-<script src="javascript/onglet_gest.js"></script>
-
-</div>
-
-<div id="fondOpaque" style="display:none"></div>
-
-
-<!-- *********************** CODE ORIGINAL DE WILL ****************** -->
-
-<!-- ##################### CONTENU PAGE ##################### -->
-<!--
-<div id="blocPrincipal" class="contenu">
-	<a href="index.php?p=crea_salle" id="linkdec"><div id="creaSalle" class="btnCreaVisu">Créer salle</div></a>
-	<a href="index.php?p=modif_salle" id="linkdec"><div id="visuSalle" class="btnCreaVisu">Visualiser salle</div></a>
-</div>
-<script src="javascript/gest_salle.js"></script>
-<script src="javascript/onglet_gest.js"></script>	
--->
-

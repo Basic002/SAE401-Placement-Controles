@@ -1,76 +1,57 @@
 <?php
-	session_start();
-	
-	// Recuperation des donnees pour un eventuel retour
-	if(isset($_SESSION['nomSalle']))
-	{
-		$nomSalle=$_SESSION['nomSalle'];
-		$batSalle=$_SESSION['batSalle'];
-		$dptSalle=$_SESSION['dptSalle'];
-		$etageSalle=$_SESSION['etageSalle'];
-	}
-	
-	function estSelec($id1, $id2)
-	{
-		if($id1==$id2)
-		{
-			return 'selected';
-		}
-	}
-	
+function cellClass(int $val): string {
+    return match($val) {
+        0 => 'couloir',
+        2 => 'placeHandi',
+        3 => 'placeInex',
+        default => 'placeOk',
+    };
+}
+
+$rows   = array_filter(explode('-', $sessionSalle['donnee'] ?? ''), fn($r) => $r !== '');
+$rows   = array_values($rows);
+$nbRang = count($rows);
+$nbCol  = $nbRang > 0 ? strlen($rows[0]) : 0;
 ?>
 
-<!-- ################################################################################################ -->
-<!-- ########################################## CORPS PAGE ########################################## -->
-<!-- ################################################################################################ -->
-
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_stage1.css">
+<link rel="stylesheet" type="text/css" href="public/css/s_stage2.css">
 
-<!-- ######################### Titre ######################## -->
-<center><h1>Modification : Informations générales</h1></center>
+<!-- #################### TITRE PRINCIPAL ################### -->
+<div class="titrecontenu">Modifier une salle — Étape 3</div>
 
-<!-- Formulaire structure salle -->
-<label for="nomSalle">Nom </label><input id="nomSalle" class="correct" type="text" value="<?php echo $nomSalle; ?>"><span class="tooltip" style="display:none"> Un nom ne peut pas être composé de moins de 2 caractères.</span><br>
-<label for="batSalle">Bâtiment </label>
-	<select id="batSalle" class="correct">
-		<option value="A">Bâtiment </option>
-		<?php
-			include('connexion.php');
-			$query1 = $pdo->query('SELECT * FROM batiment ORDER BY nom_bat');
-			while($tab1 = $query1->fetch(PDO::FETCH_ASSOC))
-			{
-				echo '<option '.estSelec($tab1['id_bat'], $batSalle).' value="'.$tab1['id_bat'].'">'.$tab1['nom_bat'].'</option>';
-			}
-		?>
-	</select>
-	<span class="tooltip" style="display:none"> Aucun bâtiment n'est selectionné.</span>
+<!-- ##################### CONTENU PAGE ##################### -->
+<div class="contenu">
 
-	<select id="dptSalle" style="display:none" class="correct">
-		<option value="A">Département </option>
-		<?php
-			include('connexion.php');
-			$query2 = $pdo->query('SELECT * FROM departement ORDER BY nom_dpt');
-			while($tab2 = $query2->fetch(PDO::FETCH_ASSOC))
-			{
-				echo '<option '.estSelec($tab2['id_dpt'], $dptSalle).' value="'.$tab2['id_dpt'].'">'.$tab2['nom_dpt'].'</option>';
-			}
-		?>
-	</select>
-	<span class="tooltip" style="display:none"> Aucun département n'est selectionné.</span>
-	
-	<br>
-	
-	<label for="etageSalle">Étage </label>
-	<select id="etageSalle" class="correct">
-		<option value="A">Étage</option>
-		<option <?php echo estSelec('0', $etageSalle); ?> value="0">RDC</option>
-		<option <?php echo estSelec('1', $etageSalle); ?> value="1">1er</option>
-		<option <?php echo estSelec('2', $etageSalle); ?> value="2">2ème</option>
-		<option <?php echo estSelec('3', $etageSalle); ?> value="3">3ème</option>
-		<option <?php echo estSelec('4', $etageSalle); ?> value="4">4ème</option>
-	</select>
-	<span class="tooltip" style="display:none"> Aucun étage n'est selectionné.</span>
+    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
 
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/crea_salle_s1.js"></script>
+    <!-- AFFICHAGE PLAN ACTUEL EN LECTURE SEULE -->
+    <table id="TAB1">
+        <?php foreach ($rows as $i => $row): ?>
+        <tr id="<?php echo $i; ?>">
+            <?php
+            $cells = str_split($row);
+            foreach ($cells as $j => $cell):
+                $cls = cellClass((int)$cell);
+            ?>
+            <td class="<?php echo htmlspecialchars($cls); ?>"
+                id="<?php echo $i . '-' . $j; ?>"></td>
+            <?php endforeach; ?>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+
+    <div class="bureau">BUREAU</div>
+
+    <!-- FORMULAIRE — passe nb_col/nb_rang au controleur -->
+    <form method="POST" action="index.php?action=modif_salle&amp;etape=3">
+        <input type="hidden" name="nb_col"  value="<?php echo $nbCol; ?>">
+        <input type="hidden" name="nb_rang" value="<?php echo $nbRang; ?>">
+
+        <div class="champ-nav">
+            <a href="index.php?action=modif_salle&amp;etape=2" class="btn-retour">← Retour</a>
+            <button type="submit">Modifier la grille →</button>
+        </div>
+    </form>
+
+</div>

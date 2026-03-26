@@ -1,69 +1,79 @@
-/* MODIF PLACE */
+/* Éditeur de grille — Étape 3 création salle */
 
-function modifPlace(x,y,val)
-{	
+var classMap = {
+    0: 'couloir',
+    1: 'placeOk',
+    2: 'placeHandi',
+    3: 'placeInex'
+};
 
-		// ############## Modification de la valeur dans la variable PHP ##############
-		
-		// Objet XHR
-		var xhr=new XMLHttpRequest();
-		
-		// Encodage des variables
-		var varX=encodeURIComponent(x);
-		var varY=encodeURIComponent(y);
-		var varVal=encodeURIComponent(val);
-		
-		// Modification de la valeur dans la variable php $_SESSION[structSalle]
-		xhr.open('POST', 'request_s3.php', true);
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send('coX='+varX+'&coY='+varY+'&val='+val);
-	
-		// ########### Modification de la classe de la case pour affichage immediat ###########
-		
-		// Recuperation element
-		var caseTab=document.getElementById(x+'-'+y);
-		
-		// Modification classe
-		var classe;
-		switch(val)
-		{
-			case 1: classe='placeOk'; break;
-			case 2: classe='placeHandi'; break;
-			case 3: classe='placeInex'; break;
-			default: break;
-		}
-		caseTab.className=classe;
-	
+var digitMap = {
+    'couloir':    0,
+    'placeOk':    1,
+    'placeHandi': 2,
+    'placeInex':  3
+};
+
+/**
+ * Returns the currently selected cell type value (0-3).
+ */
+function recupChoix() {
+    var radios = [
+        document.getElementById('radio_couloir'),
+        document.getElementById('radio_placeOk'),
+        document.getElementById('radio_handi'),
+        document.getElementById('radio_inex')
+    ];
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i] && radios[i].checked) {
+            return parseInt(radios[i].value, 10);
+        }
+    }
+    return 1; // fallback: placeOk
 }
 
-function modifEtat(id,classe)
-{
-	var xy=id.split('-');
-	var x=xy[0];
-	var y=xy[1];
-	
-	if(classe!='couloir')
-	{
-		modifPlace(x,y,recupChoix());
-	}
+/**
+ * Called on cell click. Updates the cell's CSS class based on the selected radio.
+ * No AJAX — pure DOM update.
+ */
+function modifEtat(cell) {
+    var choix = recupChoix();
+    var nouvelleClasse = classMap[choix];
+    if (nouvelleClasse !== undefined) {
+        cell.className = nouvelleClasse;
+    }
 }
 
-function recupChoix()
-{
-	var delPlace=document.getElementById('delPlace');
-	var addPlace=document.getElementById('addPlace');
-	var handiPlace=document.getElementById('handiPlace');
-	
-	if(delPlace.checked)
-	{
-		return 3;
-	}
-	else if(addPlace.checked)
-	{
-		return 1;
-	}
-	else if(handiPlace.checked)
-	{
-		return 2;
-	}
+/**
+ * Builds the donnee string from current cell classes and writes it into the
+ * hidden #donnee input.
+ * Format: for each row, concatenate the digit for each cell, then append '-'.
+ * Example: "111-010-111-"
+ */
+function buildDonnee() {
+    var table = document.getElementById('TAB1');
+    if (!table) { return; }
+
+    var result = '';
+    var rows = table.rows;
+
+    for (var i = 0; i < rows.length; i++) {
+        var cells = rows[i].cells;
+        for (var j = 0; j < cells.length; j++) {
+            var cls = cells[j].className;
+            var digit = (digitMap[cls] !== undefined) ? digitMap[cls] : 1;
+            result += digit;
+        }
+        result += '-';
+    }
+
+    var input = document.getElementById('donnee');
+    if (input) {
+        input.value = result;
+    }
 }
+
+/* On form submit, build donnee before the form is sent. */
+document.querySelector('form').addEventListener('submit', function(e) {
+    buildDonnee();
+});

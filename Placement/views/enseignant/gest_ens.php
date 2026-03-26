@@ -1,77 +1,5 @@
-<?php	
-include('connexion.php');
-	// à utiliser avec str_replace pour supprimer les accents pendant la création des logins
-	
-	$search =explode(',','á,à,â,ä,ã,å,ç,é,è,ê,ë,í,ì,î,ï,ñ,ó,ò,ô,ö,õ,ú,ù,û,ü,ý,ÿ');
-	$replace=explode(',','a,a,a,a,a,a,c,e,e,e,e,i,i,i,i,n,o,o,o,o,o,u,u,u,u,y,y');
-
-	// TEST SI L'USER A APPUYER SUR ENVOYER (CREATION ENS)
-	
-	if(isset($_POST['ajouter']) && $_POST['ajouter']=="Ajouter")
-	{
-	
-		$stmt = $pdo->prepare('SELECT COUNT(*) a FROM enseignant WHERE nom_ens = :nom_ens AND prenom_ens = :prenom_ens');
-		$stmt->execute(['nom_ens' => $_POST['nom_ens'], 'prenom_ens' => $_POST['prenom_ens']]);
-		$countex = $stmt->fetchColumn();
-		// Test si l'enseignant existe deja
-		if($countex == 0)
-		{
-			// Requete d'ajout
-			$name=str_replace($search,$replace,strtolower($_POST['nom_ens']));
-			$surname=str_replace($search,$replace,strtolower($_POST['prenom_ens']));
-
-			$login=substr($name,0,4).substr($surname,0,4);
-			
-			// Generation MDP
-				
-				// Chaine de caracteres
-				$chaine="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@";
-				
-				//nombre de caracteres dans le MDP
-				$nb_caract=8;
-				
-				// Variable MDP
-				$pass = "declic";
-			
-			$stmt = $pdo->prepare('INSERT INTO enseignant (nom_ens, prenom_ens, sexe, login, pass) VALUES (:nom_ens, :prenom_ens, :sexe, :login, :pass)');
-			$stmt->execute([
-				'nom_ens' => $_POST['nom_ens'],
-				'prenom_ens' => $_POST['prenom_ens'],
-				'sexe' => $_POST['sexe'],
-				'login' => $login,
-				'pass' => md5($pass)
-			]);
-		}
-		else
-		{
-			echo '<script>alert("Enseignant déja existant")</script>';
-		}
-	}
-	
-	// TEST SI L'USER A APPUYE SUR SUPPRIMER (ENS)
-	if(isset($_GET['suppr']))
-	{
-		// Requete de suppression
-		$stmt = $pdo->prepare('DELETE FROM enseignant WHERE id_ens = :id_ens');
-		$stmt->execute(['id_ens' => $_GET['suppr']]);
-		}
-		
-		// TEST SI L'USER A VALIDER LES MODIFICATIONS (ENS)
-		if(isset($_POST['validemodif']) && $_POST['validemodif']=="Valider")
-		{
-			$stmt = $pdo->prepare('UPDATE enseignant SET nom_ens = :nom_ens, prenom_ens = :prenom_ens, sexe = :sexe WHERE id_ens = :id_ens');
-			$stmt->execute([
-				'nom_ens' => $_POST['n_nom_ens'],
-				'prenom_ens' => $_POST['n_prenom_ens'],
-				'sexe' => $_POST['n_sexe'],
-				'id_ens' => $_POST['id_ens']
-			]);
-		}
-	
-?>
-
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_gest_ens.css">
+<link rel="stylesheet" type="text/css" href="public/css/s_gest_ens.css">
 
 <!-- #################### TITRE PRINCIPAL ################### -->
 <div class="titrecontenu">Enseignant</div>
@@ -79,69 +7,113 @@ include('connexion.php');
 <!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
 
-	<!-- BOUTON CREATION ENSEIGNANT -->
-	<div id="btncrea">Créer Enseignant</div>
-	<!-- BLOC CREATION ENSEIGNANT -->
-	<div id="bloccreaens" style="display:none">
-		<form action="index.php?p=gest_ens" method="post">
-			<label for="nom_ens">Nom &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><input type="text" id="nom_ens" name="nom_ens"><br>
-			<label for="prenom_ens">Prénom </label><input type="text" id="prenom_dpt" name="prenom_ens"><br>
-			<label for="sexe">Sexe </label><select id="sexe" name="sexe">
-				<option value="F">Femme</option>
-				<option value="M">Homme</option>
-			</select><br>
-			<input type="submit" name="ajouter" value="Ajouter">
-			<input type="submit" name="annuler" value="Annuler">
-		</form>
-	</div>
-	
-	<!-- ######### AFFICHAGE TITRE TABLEAU ######### -->
-	<?php	
-		$stmt = $pdo->query('SELECT COUNT(*) a FROM enseignant');
-		$countens = $stmt->fetchColumn();
-		
-		// TEST SI ON AFFICHE
-		if($countens)
-		{
-	?>
-	       	<div id="bloctitre"><div style="width: 210px" class="nomtitreens">Nom</div><div style="width: 210px" class="nomtitreens">Prénom</div><div style="width: 100px" class="nomtitreens">Sexe</div><div style="width: 174px" class="nomtitreens">Login</div></div>
-	<?php
-		}
-	?>
-	
-	<!-- ######### AFFICHAGE CONTENU TABLEAU ######## -->
-	<form action="index.php?p=gest_ens" method="post">
-	<?php
-		$stmt = $pdo->query('SELECT * FROM enseignant ORDER BY nom_ens');
-		while($tab1 = $stmt->fetch(PDO::FETCH_ASSOC))
-		{
-	?>
-			<div class="contenutab">
-				<div style="width: 210px" id="<?php echo 'A'.$tab1['id_ens'] ?>" class="nomtitreens"><?php echo $tab1['nom_ens']; ?></div>
-				<div style="width: 210px" id="<?php echo 'B'.$tab1['id_ens'] ?>" class="nomtitreens"><?php echo $tab1['prenom_ens']; ?></div>
-				<div style="width: 100px" id="<?php echo 'C'.$tab1['id_ens'] ?>" class="nomtitreens"><?php echo $tab1['sexe']; ?></div>
-				<div style="width: 174px" id="<?php echo 'D'.$tab1['id_ens'] ?>" class="nomtitreens"><?php echo $tab1['login']; ?></div>
-			
+<?php if (!empty($erreur)): ?>
+    <div class="bandeau-erreur"><?= htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8') ?></div>
+<?php endif; ?>
+<?php if (!empty($succes)): ?>
+    <div class="bandeau-succes"><?= $succes ?></div>
+<?php endif; ?>
 
-				<a href="#"><div onclick="modif_ens(<?php echo $tab1['id_ens']; ?>, '<?php echo $tab1['nom_ens']; ?>');" class="blocmodif"><img class="imgmodif" src="images/set.png"></div></a>
-				<a href="#"><div onclick="suppr_ens(<?php echo $tab1['id_ens']; ?>);" class="blocmodif"><img class="imgmodif" src="images/delete.png"></div></a>
-			</div>
-	<?php
-		}
-	?>			
-				
-		<div id="barreValide" style="display:none">
-			<input id="bouttonmodif" type="submit" name="validemodif" value="Valider">
-			<input id="bouttonmodif" type="submit" name="annuler" value="Annuler">
-		</div>
-		
-	</form>
-	<a href="export_pdf_ens.php" target="_blank" style="text-decoration: none; color:black;"><img width="30px" height="30px" src="images/iconpdf.jpg"></img></a>
-	
+    <!-- BOUTON CREATION ENSEIGNANT -->
+    <div id="btncrea">Créer Enseignant</div>
+
+    <!-- BLOC CREATION ENSEIGNANT -->
+    <div id="bloccreaens" style="display:none">
+        <form action="index.php?action=gest_ens" method="post">
+            <input type="hidden" name="_action" value="create">
+            <label for="nom_ens">Nom &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" id="nom_ens" name="nom_ens"><br>
+            <label for="prenom_ens">Prénom </label>
+            <input type="text" id="prenom_ens" name="prenom_ens"><br>
+            <label for="sexe">Sexe </label>
+            <select id="sexe" name="sexe">
+                <option value="F">Femme</option>
+                <option value="M">Homme</option>
+            </select><br>
+            <input type="submit" value="Ajouter">
+            <input type="button" value="Annuler" onclick="document.getElementById('bloccreaens').style.display='none';">
+        </form>
+    </div>
+
+    <!-- ######### AFFICHAGE TITRE TABLEAU ######### -->
+    <?php if (!empty($enseignants)): ?>
+        <div id="bloctitre">
+            <div style="width: 210px" class="nomtitreens">Nom</div>
+            <div style="width: 210px" class="nomtitreens">Prénom</div>
+            <div style="width: 100px" class="nomtitreens">Sexe</div>
+            <div style="width: 174px" class="nomtitreens">Login</div>
+        </div>
+    <?php endif; ?>
+
+    <!-- ######### AFFICHAGE CONTENU TABLEAU ######## -->
+    <form action="index.php?action=gest_ens" method="post">
+        <input type="hidden" name="_action" value="update">
+
+        <?php foreach ($enseignants as $ens): ?>
+            <?php
+                $id  = (int) $ens['id_ens'];
+                $nom = htmlspecialchars($ens['nom_ens'],    ENT_QUOTES, 'UTF-8');
+                $pre = htmlspecialchars($ens['prenom_ens'], ENT_QUOTES, 'UTF-8');
+                $sex = htmlspecialchars($ens['sexe'],       ENT_QUOTES, 'UTF-8');
+                $log = htmlspecialchars($ens['login'],      ENT_QUOTES, 'UTF-8');
+            ?>
+            <div class="contenutab">
+                <div style="width: 210px" id="A<?= $id ?>" class="nomtitreens"><?= $nom ?></div>
+                <div style="width: 210px" id="B<?= $id ?>" class="nomtitreens"><?= $pre ?></div>
+                <div style="width: 100px" id="C<?= $id ?>" class="nomtitreens"><?= $sex ?></div>
+                <div style="width: 174px" id="D<?= $id ?>" class="nomtitreens"><?= $log ?></div>
+
+                <a href="#"><div onclick="modif_ens(<?= $id ?>, '<?= $nom ?>');" class="blocmodif">
+                    <img class="imgmodif" src="public/images/set.png">
+                </div></a>
+                <a href="#"><div onclick="suppr_ens(<?= $id ?>);" class="blocmodif">
+                    <img class="imgmodif" src="public/images/delete.png">
+                </div></a>
+            </div>
+        <?php endforeach; ?>
+
+        <div id="barreValide" style="display:none">
+            <input id="bouttonmodif" type="submit" value="Valider">
+            <input type="button" value="Annuler" onclick="location.reload();">
+        </div>
+
+    </form>
+
+    <!-- FORMS SUPPRESSION CACHEES -->
+    <?php foreach ($enseignants as $ens): ?>
+        <?php $id = (int) $ens['id_ens']; ?>
+        <form id="formDelete<?= $id ?>" action="index.php?action=gest_ens" method="post" style="display:none">
+            <input type="hidden" name="_action" value="delete">
+            <input type="hidden" name="id_ens" value="<?= $id ?>">
+        </form>
+    <?php endforeach; ?>
+
+    <a href="public/export_pdf_ens.php" target="_blank" style="text-decoration:none; color:black;">
+        <img width="30px" height="30px" src="public/images/iconpdf.jpg">
+    </a>
+
 </div>
 
 <div id="fondOpaque" style="display:none"></div>
 
 <!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/gest_ens.js"></script>
-<script src="javascript/onglet_gest.js"></script>
+<script src="public/javascript/onglet_gest.js"></script>
+<script>
+function suppr_ens(id) {
+    if (confirm('Êtes-vous sûr ?')) document.getElementById('formDelete'+id).submit();
+}
+function modif_ens(id, nom) {
+    var e  = document.getElementById('A'+id);
+    var pe = document.getElementById('B'+id);
+    var se = document.getElementById('C'+id);
+    var lg = document.getElementById('D'+id);
+    document.getElementById('fondOpaque').style.display='';
+    document.getElementById('barreValide').style.display='';
+    e.innerHTML='<input id="blocA" class="newsaisie" style="width:200px" type="text" name="nom_ens" value="'+nom+'">'
+        +'<input type="hidden" name="id_ens" value="'+id+'">';
+    pe.innerHTML='<input class="newsaisie" style="width:200px" type="text" name="prenom_ens" value="'+pe.innerHTML+'">';
+    se.innerHTML='<select style="width:90px" name="sexe"><option value="F">Femme</option><option value="M">Homme</option></select>';
+    lg.innerHTML='<input class="newsaisie" style="width:164px" type="text" name="login" value="'+lg.innerHTML+'">';
+    document.getElementById('blocA').focus();
+}
+</script>

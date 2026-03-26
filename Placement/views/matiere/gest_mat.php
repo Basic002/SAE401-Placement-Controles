@@ -1,139 +1,114 @@
-<?php
-	
-	// TEST SI L'USER A APPUYE SUR ENVOYER (CREATION MAT)
-	if(isset($_POST['ajouter']) && $_POST['ajouter']=="Ajouter")
-	{
-			$stmt = $pdo->prepare('SELECT COUNT(*) as a FROM matiere WHERE nom_mat = :nom_mat AND id_promo = :id_promo');
-			$stmt->execute(['nom_mat' => $_POST['nom_mat'], 'id_promo' => $_POST['prom']]);
-			$countex = $stmt->fetch(PDO::FETCH_ASSOC);
-
-			// Test si la departement existe deja
-			if ($countex['a'] == 0) {
-				// Requete d'ajout
-				$stmt = $pdo->prepare('INSERT INTO matiere (nom_mat, id_promo) VALUES (:nom_mat, :id_promo)');
-				$stmt->execute(['nom_mat' => $_POST['nom_mat'], 'id_promo' => $_POST['prom']]);
-			} else {
-				echo '<script>alert("Matière déja existante")</script>';
-			}
-	
-	}
-	
-	// TEST SI L'USER A APPUYER SUR SUPPRIMER (MAT)
-	if(isset($_GET['suppr']))
-	{
-		// Requete de suppression
-		$stmt = $pdo->prepare('DELETE FROM matiere WHERE id_mat = :id_mat');
-		$stmt->execute(['id_mat' => $_GET['suppr']]);
-	}
-	
-	// TEST SI L'USER A VALIDER LES MODIFICATIONS (MAT)
-	if(isset($_POST['validemodif']) && $_POST['validemodif']=="Valider")
-	{
-		$stmt = $pdo->prepare('UPDATE matiere SET nom_mat = :nom_mat, id_promo = :id_promo WHERE id_mat = :id_mat');
-		$stmt->execute([
-			'nom_mat' => $_POST['n_nom_mat'],
-			'id_promo' => $_POST['n_promo_mat'],
-			'id_mat' => $_POST['id_mat']
-		]);
-	}
-	
-?>
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_gest_mat.css">
+<link rel="stylesheet" href="public/css/s_gest_mat.css">
 
 <!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Matières</div>
+<div class="titrecontenu">Mati&egrave;res</div>
 
 <!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
 
-	<!-- BOUTON CREATION MATIERE -->
-	<div id="btncrea">Créer matière</div>
-	<!-- BLOC CREATION MATIERE -->
-		<div id="bloccreamat" style="display:none">
-			<form action="index.php?p=gest_mat" method="post">
-				<label for="nom_mat">Nom </label><input type="text" id="nom_mat" name="nom_mat"><br>
-				<label for='prom'>Promotion </label><select id='prom' name='prom'>
-				<?php
-					$stmt = $pdo->query('SELECT * FROM promotion, departement WHERE promotion.id_dpt=departement.id_dpt ORDER BY nom_promo');
-					while ($array = $stmt->fetch(PDO::FETCH_ASSOC)) {
-						echo '<option value='.$array['id_promo'].'>'.$array['nom_promo'].' '.$array['nom_dpt'].' '.$array['annee'].'</option>';
-					}
-				?>
-				</select><br>
-				<input type="submit" name="ajouter" value="Ajouter">
-				<input type="submit" name="annuler" value="Annuler">
-			</form>
-		</div>
-		
-<!-- ######### AFFICHAGE TITRE TABLEAU ######### -->
-			<?php	
-			$stmt = $pdo->query('SELECT COUNT(*) as a FROM matiere');
-			$countmat = $stmt->fetch(PDO::FETCH_ASSOC);
-			?>
-			<div id="bloctitre"><div class="nomtitre">Matière</div><div class="nomtitre">Promotion</div></div>	
-	
-<!-- ######### AFFICHAGE CONTENU TABLEAU ######## -->
-			<form action="index.php?p=gest_mat" method="post">
-				<?php
-					$stmt = $pdo->query('SELECT * FROM matiere, promotion, departement WHERE matiere.id_promo=promotion.id_promo AND promotion.id_dpt=departement.id_dpt ORDER BY nom_promo, nom_mat, nom_dpt');
-					while ($tab1 = $stmt->fetch(PDO::FETCH_ASSOC))
-					{
-				?>
-				<div class="contenutab">
-					<div id="<?php echo 'A'.$tab1['id_mat'] ?>" class="nomtitre"><?php echo $tab1['nom_mat']; ?></div>
-					<div id="<?php echo 'B'.$tab1['id_mat'] ?>" class="nomtitre"><?php echo $tab1['nom_promo'].' '.$tab1['nom_dpt'].' '.$tab1['annee']; ?></div>
-					<div onclick="modif_mat(<?php echo $tab1['id_mat']; ?>, '<?php echo addslashes($tab1['nom_mat']); ?>');" class="blocmodif"><img class="imgmodif" src="images/set.png"></div>
-					<a href="#"><div onclick="suppr_mat(<?php echo $tab1['id_mat']; ?>);" class="blocmodif"><img class="imgmodif" src="images/delete.png"></div></a>
-				</div>
-				<?php
-				}
-				?>
-	
-				<div id="barreValide" style="display:none">
-					<input id="bouttonmodif" type="submit" name="validemodif" value="Valider">
-					<input id="bouttonmodif" type="submit" name="annuler" value="Annuler">
-				</div>
-		
-			</form>	
-	
-		</div>
-	</div>
-	<div id="fondOpaque" style="display:none"></div>
+    <?php if (!empty($erreur)): ?>
+        <div class="message erreur"><?= htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php endif; ?>
+    <?php if (!empty($succes)): ?>
+        <div class="message succes"><?= htmlspecialchars($succes, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php endif; ?>
+
+    <!-- BOUTON CREATION MATIERE -->
+    <div id="btncrea">Cr&eacute;er mati&egrave;re</div>
+
+    <!-- BLOC CREATION MATIERE -->
+    <div id="bloccreamat" style="display:none">
+        <form action="index.php?action=gest_mat" method="post">
+            <input type="hidden" name="_action" value="create">
+            <label for="nom_mat">Nom </label>
+            <input type="text" id="nom_mat" name="nom_mat"><br>
+            <label for="id_promo">Promotion </label>
+            <select id="id_promo" name="id_promo">
+                <?php foreach ($promotions as $promo): ?>
+                    <option value="<?= (int)$promo['id_promo'] ?>">
+                        <?= htmlspecialchars($promo['nom_dpt'] . ' ' . $promo['nom_promo'] . ' ' . $promo['annee'], ENT_QUOTES, 'UTF-8') ?>
+                    </option>
+                <?php endforeach; ?>
+            </select><br>
+            <input type="submit" value="Ajouter">
+            <input type="button" value="Annuler" onclick="document.getElementById('bloccreamat').style.display='none';">
+        </form>
+    </div>
+
+    <!-- ######### AFFICHAGE TITRE TABLEAU ######### -->
+    <?php if (!empty($matieres)): ?>
+        <div id="bloctitre">
+            <div class="nomtitre">Mati&egrave;re</div>
+            <div class="nomtitre">Promotion</div>
+        </div>
+    <?php endif; ?>
+
+    <!-- ######### AFFICHAGE CONTENU TABLEAU ######## -->
+    <form action="index.php?action=gest_mat" method="post">
+        <input type="hidden" name="_action" value="update">
+
+        <?php foreach ($matieres as $mat): ?>
+            <div class="contenutab">
+                <div id="<?= 'A' . (int)$mat['id_mat'] ?>" class="nomtitre">
+                    <?= htmlspecialchars($mat['nom_mat'], ENT_QUOTES, 'UTF-8') ?>
+                </div>
+                <div id="<?= 'B' . (int)$mat['id_mat'] ?>" class="nomtitre">
+                    <?= htmlspecialchars($mat['nom_promo'] . ' ' . $mat['nom_dpt'] . ' ' . $mat['annee'], ENT_QUOTES, 'UTF-8') ?>
+                </div>
+                <div onclick="modif_mat(<?= (int)$mat['id_mat'] ?>, <?= htmlspecialchars(json_encode($mat['nom_mat']), ENT_QUOTES, 'UTF-8') ?>);" class="blocmodif"><img class="imgmodif" src="public/images/set.png"></div>
+                <a href="#"><div onclick="suppr_mat(<?= (int)$mat['id_mat'] ?>);" class="blocmodif"><img class="imgmodif" src="public/images/delete.png"></div></a>
+            </div>
+        <?php endforeach; ?>
+
+        <div id="barreValide" style="display:none">
+            <input id="bouttonmodif" type="submit" value="Valider">
+            <input type="button" value="Annuler" onclick="window.location='index.php?action=gest_mat';">
+        </div>
+
+    </form>
+
+    <!-- FORMULAIRES DE SUPPRESSION CACHÉS (un par matière) -->
+    <?php foreach ($matieres as $mat): ?>
+        <form id="formDelete<?= (int)$mat['id_mat'] ?>" action="index.php?action=gest_mat" method="post" style="display:none">
+            <input type="hidden" name="_action" value="delete">
+            <input type="hidden" name="id_mat" value="<?= (int)$mat['id_mat'] ?>">
+        </form>
+    <?php endforeach; ?>
+
 </div>
 
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/gest_mat.js"></script>
-<script src="javascript/onglet_gest.js"></script>
+<div id="fondOpaque" style="display:none"></div>
 
+<!-- ################## IMPORT JAVASCRIPT ################### -->
+<script src="public/javascript/gest_mat.js"></script>
+<script src="public/javascript/onglet_gest.js"></script>
 <script>
-	// ########################## MODIFICATION MATIERE #########################
-	function modif_mat(id,nom)
-	{
-		// VARIABLE BLOC B,C,D
-		var blocA=document.getElementById('A'+id);
-		var blocB=document.getElementById('B'+id);
-		
-		// MISE EN PLACE DU FOND OPAQUE
-		var blocFond=document.getElementById('fondOpaque');
-		blocFond.style.display='';
-		
-		// MISE EN PLACE BLOC VALIDATION
-		var barreValide=document.getElementById('barreValide');
-		barreValide.style.display='';
-		
-		// MISE EN PLACE DES CHAMPS DE MODIF
-		blocA.innerHTML='<input id="blocA" class="newsaisie" type="text" name="n_nom_mat" value="'+nom+'"><input type="hidden" name="id_mat" value='+id+'>';
-		// blocB.innerHTML='<input id="blocB" class="newsaisie" type="text" name="n_promo_mat" value="'+blocB.innerHTML+'">';
-		
-		blocB.innerHTML="<div id='listeDer'><select id='listeDer2' name='n_promo_mat'><?php 
-		$stmt = $pdo->query('SELECT * FROM promotion, departement WHERE promotion.id_dpt=departement.id_dpt ORDER BY nom_promo'); 
-		while($array = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			echo '<option value='.$array['id_promo'].'>'.$array['nom_promo'].' '.$array['nom_dpt'].' '.$array['annee'].'</option>';
-		} 
-		?></select></div>";
-		
-		// FOCUS SUR CHAMP
-		document.getElementById('blocA').focus();
-	}
+// Données promotions disponibles pour le select de modification
+var promOptions = <?= json_encode(array_map(fn($p) => ['v' => $p['id_promo'], 'l' => $p['nom_dpt'] . ' ' . $p['nom_promo'] . ' ' . $p['annee']], $promotions)) ?>;
+
+// Override suppr_mat pour utiliser POST
+function suppr_mat(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette matière ?')) {
+        document.getElementById('formDelete' + id).submit();
+    }
+}
+// Override modif_mat pour les bons noms de champs
+function modif_mat(id, nom) {
+    // Générer le HTML du select à partir des options
+    var selectHtml = '<div id="listeDer"><select id="listeDer2" name="id_promo">';
+    for (var i = 0; i < promOptions.length; i++) {
+        selectHtml += '<option value="' + promOptions[i].v + '">' + promOptions[i].l + '</option>';
+    }
+    selectHtml += '</select></div>';
+
+    document.getElementById('A' + id).innerHTML =
+        '<input id="blocA" class="newsaisie" type="text" name="nom_mat" value="' + nom + '">'
+        + '<input type="hidden" name="id_mat" value="' + id + '">';
+    document.getElementById('B' + id).innerHTML = selectHtml;
+
+    document.getElementById('fondOpaque').style.display = '';
+    document.getElementById('barreValide').style.display = '';
+    document.getElementById('blocA').focus();
+}
 </script>

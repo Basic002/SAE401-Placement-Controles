@@ -1,274 +1,122 @@
-// Adaptation taille frame
+// Fetch groupe list when promo changes
+async function grDynamique() {
+    const idPromo = document.getElementById('sel_promo').value;
+    if (!idPromo) return;
 
-function recalculeTailleFrame()
-{
-	const myFrame=window.top.document.getElementById('myFrame');
-	//const taille=document.body.scrollHeight;
-	myFrame.style.height=280;
+    const resp = await fetch('index.php?action=ajax_groupe', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'idPromo=' + encodeURIComponent(idPromo)
+    });
+    const data = await resp.json();
+
+    // Repopulate sel_groupe
+    const sel = document.getElementById('sel_groupe');
+    sel.innerHTML = '<option value="0">Toute la promo</option>';
+    data.forEach(g => {
+        sel.innerHTML += '<option value="' + g.id_groupe + '">' + escHtml(g.nom_groupe) + '</option>';
+    });
+    sel.style.display = '';
+
+    await matDynamique();
+    affBtn();
 }
 
-window.onload=recalculeTailleFrame();
+async function matDynamique() {
+    const idPromo = document.getElementById('sel_promo').value;
+    const resp = await fetch('index.php?action=ajax_matiere', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'idPromo=' + encodeURIComponent(idPromo)
+    });
+    const data = await resp.json();
 
-function affPromo()
-{
-	// Recuperation variables
-	const listPromo=document.getElementById('promo');
-	const listGr=document.getElementById('groupe');
-	const listMat=document.getElementById('matiere');
-	const btnAddCombi=document.getElementById('btnAddCombi');
-	const listSalle=document.getElementById('salle');
-
-	// Devoile liste groupe
-	if(listPromo.value!='A')
-	{
-		// Devoile liste groupe
-		listGr.style.display='';
-		// Devoile liste matiere
-		listMat.style.display='';
-		// Devoile liste salle
-		listSalle.style.display='';
-		
-		if(listSalle.value!='A' && listMat.value!='A')
-		{
-			btnAddCombi.style.display='';
-		}
-	}
-	else
-	{
-		// Cache liste groupe
-		listGr.style.display='none';
-		// Cache liste matiere
-		listMat.style.display='none';
-		// Cache liste salle
-		listSalle.style.display='none';
-		// Cache bouton
-		btnAddCombi.style.display='none';	
-	}
+    const sel = document.getElementById('sel_matiere');
+    sel.innerHTML = '<option value="">-- Matière --</option>';
+    data.forEach(m => {
+        sel.innerHTML += '<option value="' + m.id_mat + '">' + escHtml(m.nom_mat) + '</option>';
+    });
+    sel.style.display = '';
+    sel.onchange = affBtn;
 }
 
-// Affichage bouton btnAddCombi
-function affBtn()
-{
-	const btnAddCombi=document.getElementById('btnAddCombi');
-	const listSalle=document.getElementById('salle');
-	const listMat=document.getElementById('matiere');
-	
-	if(listSalle.value!='A' && listMat.value!='A')
-	{
-		btnAddCombi.style.display='';
-	}
-	else
-	{
-		btnAddCombi.style.display='none';
-	}
-}
-	
-
-// Fonction de verification methode a utilise.
-function getXhr()
-{
-	let xhr = null;
-	if(window.XMLHttpRequest) // Firefox et autres
-	   xhr = new XMLHttpRequest(); 
-	else if(window.ActiveXObject)
-	{ 
-		// Internet Explorer 
-	   	try
-	   	{
-	   		xhr = new ActiveXObject("Msxml2.XMLHTTP");
-	   	}
-	   	catch (e)
-	   	{
-	   		xhr = new ActiveXObject("Microsoft.XMLHTTP");
-	   	}
-	}
-	else
-	{
-		// XMLHttpRequest non supporté par le navigateur 
-		alert("Votre navigateur ne supporte pas les objets XMLHTTPRequest...");
-		xhr = false; 
-	} 
-	return xhr;
+function affBtn() {
+    const promo = document.getElementById('sel_promo').value;
+    const salle = document.getElementById('sel_salle').value;
+    const mat = document.getElementById('sel_matiere');
+    const btn = document.getElementById('btnAddCombi');
+    if (promo && salle && mat && mat.value) {
+        btn.style.display = '';
+    } else {
+        btn.style.display = 'none';
+    }
 }
 
-// Affichage des groupes en fonction de la promo
-function grDynamique()
-{
-	const xhr=getXhr();
-	
-	// On définit ce qu'on va faire quand on aura la réponse
-	xhr.onreadystatechange = function(){
-		// Reception et serveur ok
-		if(xhr.readyState == 4 && xhr.status == 200)
-		{
-			leselect = xhr.responseText;
-			document.getElementById('groupe').innerHTML = leselect;
-		}
-	}
-	
-	xhr.open("POST","ajaxGroupe.php",false);
-	//Choix encodage
-	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-	// Recuperation idPromo choisis
-	sel=document.getElementById('promo');
-	idpromo=sel.options[sel.selectedIndex].value;
-	xhr.send("idPromo="+idpromo);
-	// Affichage de la liste
-	
-	matDynamique();
-	
-	affPromo();
-	
-	document.getElementById('btnAddCombi').style.display="none";
+async function recupCombi() {
+    const idPromo = document.getElementById('sel_promo').value;
+    const idGroupe = document.getElementById('sel_groupe').value || 0;
+    const idSalle = document.getElementById('sel_salle').value;
+    const idMat = document.getElementById('sel_matiere').value;
+
+    const resp = await fetch('index.php?action=ajax_add_combi', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'idPromo=' + encodeURIComponent(idPromo)
+            + '&idGroupe=' + encodeURIComponent(idGroupe)
+            + '&idSalle=' + encodeURIComponent(idSalle)
+            + '&idMat=' + encodeURIComponent(idMat)
+    });
+    const data = await resp.json();
+
+    if (!data.ok) {
+        alert(data.message || 'Erreur lors de l\'ajout.');
+    }
+    renderCombi(data.combinaisons || []);
 }
 
-// Affichage des matieres en fonction de la promo
-function matDynamique()
-{
-	const xhr=getXhr();
-	
-	// On définit ce qu'on va faire quand on aura la réponse
-	xhr.onreadystatechange = function(){
-		// Reception et serveur ok
-		if(xhr.readyState == 4 && xhr.status == 200)
-		{
-			leselect = xhr.responseText;
-			document.getElementById('matiere').innerHTML = leselect;
-		}
-	}
-	
-	xhr.open("POST","ajaxMatiere.php",false);
-	//Choix encodage
-	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-	// Recuperation idPromo choisis
-	sel=document.getElementById('promo');
-	idpromo=sel.options[sel.selectedIndex].value;
-	xhr.send("idPromo="+idpromo);
+async function supprCombi(index) {
+    const resp = await fetch('index.php?action=ajax_suppr_combi', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'index=' + encodeURIComponent(index)
+    });
+    const data = await resp.json();
+    renderCombi(data.combinaisons || []);
 }
 
-function sleep(delay)
-{
-	const start = new Date().getTime();
-	while (new Date().getTime() < start + delay);
+function renderCombi(combinaisons) {
+    const div = document.getElementById('tabRecap');
+    if (!combinaisons.length) {
+        div.innerHTML = '';
+        document.getElementById('btnSuivant').disabled = true;
+        return;
+    }
+    let html = '<table><tr><th>Promo/Groupe</th><th>Salle</th><th>Matière</th><th>Étudiants</th><th></th></tr>';
+    combinaisons.forEach((c, i) => {
+        html += '<tr>'
+            + '<td>' + escHtml(c.label_promo) + '</td>'
+            + '<td>' + escHtml(c.nom_salle) + '</td>'
+            + '<td>' + escHtml(c.nom_mat) + '</td>'
+            + '<td>' + c.nb_etud + '</td>'
+            + '<td><button type="button" onclick="supprCombi(' + i + ')">&#x2715;</button></td>'
+            + '</tr>';
+    });
+    html += '</table>';
+    div.innerHTML = html;
+    document.getElementById('btnSuivant').disabled = false;
 }
 
-// Adaptation taille frame
-
-function tailleFrame(plus)
-{
-	const myFrame=window.top.document.getElementById('myFrame');
-	const taille=document.body.scrollHeight;
-	if (plus) {
-		myFrame.style.height = taille + 60;
-	} else {
-		myFrame.style.height = taille - 60;
-	}
-
-}
-	
-	
-/**
-*	On récupère les informations sur le placement courant (promo, groupe, matière et salle)
-*	pour les mettre à jour sur le serveur. Si l'étape se passe sans encombre (pas de data), alors
-*	on met à jour les combinaisons (partie basse de l'affichage), sinon on affiche data (erreur)
-*/
-function recupCombi()
-{		
-	// Variables
-	const listPromo=document.getElementById('promo');
-	const listGr=document.getElementById('groupe');
-	const listMat=document.getElementById('matiere');
-	const listSalle=document.getElementById('salle');
-
-	$.post(
-			"ajaxAddCombi.php",
-			{
-				'promo'  : listPromo.value,
-				'groupe' : listGr.value,
-				'matiere': listMat.value,
-				'salle'  : listSalle.value
-			}, function(data){
-				if(data!="ok"){
-					alert("erreur : "+data);
-				}else{
-					afficheCombi(true);
-				}
-			}
-		);
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
-function supprCombi(idCombi)
-{	
-		// Objet XHR
-		const xhr=new XMLHttpRequest();
-
-		// Modification de la valeur dans la variable php $_SESSION[structSalle]
-		xhr.open('POST', 'ajaxSupprCombi.php', false);
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send("idCombi="+idCombi);
-		
-		// Affiche combi
-		afficheCombi(false);
-}
-
-function afficheCombi(plus)
-{			
-	// Variables
-	const tabRecap=document.getElementById('tabRecap');
-	
-	// Objet XHR
-	const xhr=getXhr();
-	
-	// On définit ce qu'on va faire quand on aura la réponse
-	xhr.onreadystatechange = function(){
-		// Reception et serveur ok
-		if(xhr.readyState == 4 && xhr.status == 200)
-		{
-			leselect = xhr.responseText;
-			document.getElementById('tabRecap').innerHTML = leselect;
-		}
-	}
-	xhr.open("POST","ajaxAfficheCombi.php",false);
-	
-	//Choix encodage
-	xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-	// Envoie des variables
-	xhr.send(null);
-	
-	tailleFrame(plus);
-	affBtnNavigation();
-	
-}
-
-// ##### Affichage boutons #####
-
-function affBtnNavigation() {
-
-	const btnnext=parent.document.getElementById('btnnext');
-		const promoChoisies = document.getElementsByClassName('supprCombi');
-		if (promoChoisies.length > 0) {
-			btnnext.disabled = '';
-		} else {
-			btnnext.disabled = 'disabled';
-		}
-}
-
-
-// ######## GENERAL ##########
-
-	// Modification automatique des minutes lors du choix de l'heure
-	const hDeb=document.getElementById('h_deb');
-	const mDeb=document.getElementById('m_deb');
-	
-	const hDuree=document.getElementById('h_duree');
-	const mDuree=document.getElementById('m_duree');
-	
-	hDeb.addEventListener('change', function(e) {
-		mDeb.value='00';
-	}, false);
-	
-	hDuree.addEventListener('change', function(e) {
-		mDuree.value='00';
-	}, false);
-	
-	
+// Load existing combinaisons on page load
+(async function () {
+    const resp = await fetch('index.php?action=ajax_affiche_combi', {method: 'POST'});
+    const data = await resp.json();
+    renderCombi(data.combinaisons || []);
+})();

@@ -1,141 +1,46 @@
-<?php
-	session_start();
-	
+<link rel="stylesheet" href="public/css/s_up_stage3.css">
 
-	// Enregistrement devoir
-	function saveDevoir()
-	{
-	include('../connexion.php');
+<div class="titrecontenu">Étape 3 — Export</div>
 
-		$datefr = $_SESSION['dateDevoir'];
-		$datebdd = $datefr;
-		$datebdd = substr($datefr, 6  , 4)."-".substr($datefr, 4  , 2)."-".substr($datefr, 0  , 2);
+<div class="contenu">
 
-		$stmt=$pdo->prepare('INSERT INTO devoir(nom_devoir, date_devoir, heure_devoir, duree_devoir) VALUES (?,?,?,?)');
-		$stmt->execute([$_SESSION['mDevoir']." ".$datefr, $datebdd, $_SESSION['hDevoir'].':'.$_SESSION['mDevoir'], $_SESSION['hDuree'].':'.$_SESSION['mDuree']]);
-		
-		$idDevoir=$pdo->lastInsertId();
-		
-		return $idDevoir;
-	}
-		
-	// Enregistrement BDD
-	function savePlacementDB($w, $idSalle, $idDevoir)
-	{
-	include('../connexion.php');
-		foreach($_SESSION['placement'][$w] as $value)
-		{
-			$stmt=$pdo->prepare('INSERT INTO placement(id_etudiant, id_devoir, id_salle, place_x, place_y) VALUES (?, ?, ?, ?, ?)');
-			$stmt->execute([$value[2], $idDevoir, $idSalle, $value[0], $value[1]]);
-		}
-	}
-	
-	// Enregistrement des devoirs groupe / devoirs promo
-	function saveProgDevoir($idDevoir)
-	{
-	include('../connexion.php');
-		for($i=0; $i<$_SESSION['nbCombi']; $i++)
-		{
-			if($_SESSION['infoCombi'][$i][1]==0)
-			{
-				$stmt=$pdo->prepare('INSERT INTO devoir_promo(id_salle, id_devoir, id_promo, id_mat) VALUES (?, ?, ?, ?)');
-				$stmt->execute([$_SESSION['infoCombi'][$i][2],$idDevoir,$_SESSION['infoCombi'][$i][0],$_SESSION['infoCombi'][$i][3]]);
-			}
-			else
-			{
-				$stmt=$pdo->prepare('INSERT INTO devoir_groupe(id_salle, id_devoir, id_groupe, id_mat) VALUES (?, ?, ?, ?)');
-				$stmt->execute([$_SESSION['infoCombi'][$i][2], $idDevoir, $_SESSION['infoCombi'][$i][1], $_SESSION['infoCombi'][$i][3]]);
-			}
-		}
-	}
-		
-?>
+    <h3>Devoir enregistré : <?php echo htmlspecialchars($nomDevoir); ?></h3>
 
-<!-- ################################################################################################ -->
-<!-- ########################################## CORPS PAGE ########################################## -->
-<!-- ################################################################################################ -->
+    <table id="tabPDF">
+        <tr>
+            <th>Salle</th>
+            <th>Liste</th>
+            <th>Feuille d'émargement</th>
+            <th>Plan</th>
+        </tr>
+        <?php foreach ($sallesInfo as $salle): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($salle['nom_salle']); ?></td>
+                <td class="btnPDF">
+                    <a target="_blank"
+                       href="index.php?action=export_pdf&varD=1&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
+                        <img class="imgPDF" src="public/images/loupe.png" alt="Voir liste">
+                    </a>
+                </td>
+                <td class="btnPDF">
+                    <a target="_blank"
+                       href="index.php?action=export_pdf&varD=2&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
+                        <img class="imgPDF" src="public/images/loupe.png" alt="Voir émargement">
+                    </a>
+                </td>
+                <td class="btnPDF">
+                    <a target="_blank"
+                       href="index.php?action=visu_salle&id_salle=<?php echo (int)$salle['id_salle']; ?>&id_devoir=<?php echo (int)$idDevoir; ?>">
+                        <img class="imgPDF" src="public/images/loupe.png" alt="Voir plan">
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
 
-<!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="../css/s_generique.css">
-<link rel="stylesheet" type="text/css" href="../css/s_up_stage1.css">
-<link rel="stylesheet" type="text/css" href="../css/s_stage4.css">
-<link rel="stylesheet" type="text/css" href="../css/s_up_stage3.css">
+    <div class="form-nav">
+        <a href="index.php?action=util_placement">Nouveau placement &rarr;</a>
+        <a href="index.php?action=home">Retour à l'accueil &rarr;</a>
+    </div>
 
-<!-- ######################### Titre ######################## -->
-<center><h1>Étape 3 : Exportation</h1></center>
-
-<?php
-	// ############ Enregistrement DB ############
-	$idDevoir=saveDevoir();
-	saveProgDevoir($idDevoir);
-	
-	for($i=0; $i<$_SESSION['nbSalle']; $i++)
-	{
-		savePlacementDB($i, $_SESSION['salleUtil'][$i], $idDevoir);
-	}
-	include('../connexion.php');
-?>
-
-
-<br><br>
-
-<!-- TABLEAU PDF VERSION 2 -->
-<table id="tabPDF">
-	<!-- TITRE -->
-	<tr>
-		<td style="background: transparent"></td>
-		<td>Liste</td>
-		<td>Feuille d'émargement</td>
-		<td>Plan</td>
-	</tr>
-
-	<!-- LISTE SALLE -->	
-	<?php
-		for($i=0; $i<$_SESSION['nbSalle']; $i++)
-		{
-			echo '<tr>';
-			
-			$stmt=$pdo->prepare("SELECT nom_salle FROM salle WHERE id_salle=:id_salle");
-			$stmt->execute(['id_salle'=>$_SESSION['salleUtil'][$i]]);
-			$res=$stmt->fetch(PDO::FETCH_ASSOC);
-			echo '<td>'.$res['nom_salle'].'</td>';
-			
-			// Liste
-			echo '<td class="btnPDF"><a target="_blank" href="export_pdf.php?varD=1&idDevoir='.$idDevoir.'&idSalle='.$_SESSION['infoCombi'][$i][2].'&idPromo='.$_SESSION['infoCombi'][$i][0].'"><img class="imgPDF" src="../images/loupe.png"></a></td>';
-			// Emargement
-			echo '<td class="btnPDF"><a target="_blank" href="export_pdf.php?varD=2&idDevoir='.$idDevoir.'&idSalle='.$_SESSION['infoCombi'][$i][2].'&idPromo='.$_SESSION['infoCombi'][$i][0].'"><img class="imgPDF" src="../images/loupe.png"></a></td>';
-			// Plan
-			echo '<td class="btnPDF"><a target="_blank" href="../x_salle.php?idDevoir='.$idDevoir.'&idSalle='.$_SESSION['infoCombi'][$i][2].'"><img class="imgPDF" src="../images/loupe.png"></a></td>';
-			
-			echo '</tr>';
-		}
-
-	?>
-</table>
-
-<br>
-
-<center>
-<?php
-	// ############ Sortie PDF liste promo #############
-	echo '<br>';
-	
-	if ($_SESSION['nbPromo'] > 1) {
-		echo '<h3>Liste par promo</h3>';
-		for($i=0; $i<$_SESSION['nbPromo']; $i++)
-		{
-			$stmt=$pdo->prepare("SELECT nom_promo, nom_dpt FROM promotion, departement WHERE promotion.id_dpt=departement.id_dpt AND id_promo= :id_promo");
-			$stmt->execute(['id_promo'=>$_SESSION['infoCombi'][$i][0]]);
-			$info=$stmt->fetch(PDO::FETCH_ASSOC);
-			$nomSalle=$infos['nom_dpt'].' '.$infos['nom_promo'];
-			echo '<a target="_blank" href="export_pdf.php?varD=3&idDevoir='.$idDevoir.'&idSalle='.
-							$_SESSION['infoCombi'][$i][2].'&idPromo='.
-							$_SESSION['infoCombi'][$i][0].'">'.$nomSalle.'</a><br>'; 
-		}
-	}
-?>
-</center>
-
-<!-- ##################### IMPORT JAVASCRIPT ################## -->
-<script src="javascript/up_stage2.js"></script>
-<script src="javascript/onglet_salle.js"></script>
+</div>

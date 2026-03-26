@@ -1,61 +1,65 @@
 <?php
-	session_start();
-	
-	// ################# Modifie la classe pour l'affichage ##################
-	function modifClasse($val)
-	{
-		switch ($val)
-		{
-			case 0: $classe='couloir'; break;
-			case 1: $classe='placeOk'; break;
-			case 2: $classe='placeHandi'; break;
-			case 3: $classe='placeInex'; break;
-			default: break;
-		}
-		return $classe;
-	}
-	
+function cellClass(int $val): string {
+    return match($val) {
+        0 => 'couloir',
+        2 => 'placeHandi',
+        3 => 'placeInex',
+        default => 'placeOk',
+    };
+}
+
+$donnee   = $sessionSalle['donnee'] ?? '';
+$rows     = array_filter(explode('-', $donnee), fn($r) => $r !== '');
+$rows     = array_values($rows);
+$placeOk  = substr_count($donnee, '1');
+$placeHandi = substr_count($donnee, '2');
 ?>
 
-<!-- ################################################################################################ -->
-<!-- ########################################## CORPS PAGE ########################################## -->
-<!-- ################################################################################################ -->
-
 <!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_stage3.css">
+<link rel="stylesheet" type="text/css" href="public/css/s_stage4.css">
 
-<!-- ######################### Titre ######################## -->
-<center><h1>Modification : &Eacute;tats places</h1></center>
+<!-- #################### TITRE PRINCIPAL ################### -->
+<div class="titrecontenu">Modifier une salle — Étape 5</div>
 
-<center>
+<!-- ##################### CONTENU PAGE ##################### -->
+<div class="contenu">
 
-	<!-- #################### Choix action ################## -->
-	<form>
-		<input type="radio" name="choixEtat" id="delPlace" checked="true" >Supprimer place</input>
-		<input type="radio" name="choixEtat" id="addPlace">Ajouter place</input>
-		<input type="radio" name="choixEtat" id="handiPlace">Place "handicapé"</input>
-	</form>
+    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
 
-	<!-- ############ Affichage structure salle ############# -->
-	<table id="TAB1">
-		<?php
-			for($i=0; $i<$_SESSION['rangSalle']; $i++)
-			{
-				echo '<tr id="'.$i.'">';
-		
-				for($j=0; $j<$_SESSION['colSalle']; $j++)
-				{
-					echo '<td class="'.modifClasse($_SESSION['structSalle'][$i][$j]).'" id="'.$i.'-'.$j.'" onclick="modifEtat(this.id, this.className)"></td>';	
-				}
-				echo '</tr>';
-				
-			}
-		?>
-	</table>
-	
-</center>
+    <!-- CAPACITE -->
+    <p>
+        <strong><?php echo $placeOk; ?></strong> places
+        <?php if ($placeHandi > 0): ?>
+        (+ <strong><?php echo $placeHandi; ?></strong> place<?php echo $placeHandi > 1 ? 's' : ''; ?> PMR)
+        <?php endif; ?>
+    </p>
 
-<br><center><div class="bureau">BUREAU</div></center>
+    <!-- APERCU GRILLE EN LECTURE SEULE -->
+    <table id="TAB1">
+        <?php foreach ($rows as $i => $row): ?>
+        <tr id="<?php echo $i; ?>">
+            <?php
+            $cells = str_split($row);
+            foreach ($cells as $j => $cell):
+                $cls = cellClass((int)$cell);
+            ?>
+            <td class="<?php echo htmlspecialchars($cls); ?>"
+                id="<?php echo $i . '-' . $j; ?>"></td>
+            <?php endforeach; ?>
+        </tr>
+        <?php endforeach; ?>
+    </table>
 
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="javascript/crea_salle_s3.js"></script>
+    <div class="bureau">BUREAU</div>
+
+    <!-- FORMULAIRE DE VALIDATION -->
+    <form method="POST" action="index.php?action=modif_salle&amp;etape=5">
+        <input type="hidden" name="donnee" value="<?php echo htmlspecialchars($donnee); ?>">
+
+        <div class="champ-nav">
+            <a href="index.php?action=modif_salle&amp;etape=4" class="btn-retour">← Retour</a>
+            <button type="submit">Confirmer →</button>
+        </div>
+    </form>
+
+</div>

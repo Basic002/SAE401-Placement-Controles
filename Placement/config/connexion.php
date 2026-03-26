@@ -10,14 +10,18 @@ if (file_exists($envPath)) {
     // Lit le fichier ligne par ligne
     $lignes = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lignes as $ligne) {
-        // Ignorer les commentaires (lignes commençant par # ou #)
-        if (strpos(trim($ligne), '#') === 0 || strpos(trim($ligne), '[source') === 0) {
+        // Ignorer les lignes de commentaire (commençant par #)
+        if (strpos(trim($ligne), '#') === 0) {
             continue;
         }
-        // Séparer le nom et la valeur
+        // Séparer nom et valeur sur le premier '='
         if (strpos($ligne, '=') !== false) {
-            list($nom, $valeur) = explode('=', $ligne, 2);
-            $_ENV[trim($nom)] = trim($valeur);
+            [$nom, $valeur] = explode('=', $ligne, 2);
+            // Supprimer les guillemets optionnels et les commentaires inline (# ...)
+            $valeur = trim($valeur);
+            $valeur = preg_replace('/\s+#.*$/', '', $valeur); // supprime commentaire inline
+            $valeur = trim($valeur, '"\'');                   // supprime guillemets éventuels
+            $_ENV[trim($nom)] = $valeur;
         }
     }
 } else {

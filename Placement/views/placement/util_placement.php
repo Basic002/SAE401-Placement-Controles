@@ -1,29 +1,14 @@
-<?php
-	// Reinitialisation informations
-	$_SESSION['dateDevoir']='';
-	$_SESSION['hDevoir']='';
-	$_SESSION['mDevoir']='';
-	$_SESSION['hDuree']='';
-	$_SESSION['mDuree']='';
-?>
-	
-	<!-- ##################### IMPORT STYLE ##################### -->
-<link rel="stylesheet" type="text/css" href="css/s_util_placement.css">
+<link rel="stylesheet" href="public/css/s_util_placement.css">
 
-<!-- #################### TITRE PRINCIPAL ################### -->
 <div class="titrecontenu">Placement</div>
 
-<!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
-
-	<!-- iFrame pour faire defiler les etapes -->
-	<iframe id="myFrame" name="stage1" src="util_placement/up_stage1.php" scrolling="yes" style="height:280px;border: none"></iframe>
-	
-	<!-- Bouton precedent/suivant -->
-	<button type="button" id="btnbef" style="display:none; float:left; margin-left:20px;">Précédent</button>
-	<button type="button" id="btnnext" style="float: right; margin-right: 20px;">Suivant</button>
-
+    <p>Bienvenue dans le placement aléatoire.</p>
+    <p>
+        Cet assistant vous guide pas à pas pour organiser le placement des étudiants lors d'un devoir surveillé.
+        Vous définirez les informations du devoir (date, heure, durée) ainsi que les combinaisons
+        promotion/groupe/salle/matière. Le placement sera ensuite généré automatiquement et vous pourrez
+        ajuster les places manuellement avant d'enregistrer et d'exporter les documents nécessaires.
+    </p>
+    <a class="btn-commencer" href="index.php?action=placement_stage1">Commencer &rarr;</a>
 </div>
-
-<!-- ################## IMPORT JAVASCRIPT ################### -->
-<script src="util_placement/javascript/util_placement.js"></script>
