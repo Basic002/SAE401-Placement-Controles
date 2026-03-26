@@ -248,9 +248,9 @@ function ds_onclick(d, m, y) {
 	// Maybe we want to set the HTML in it.
 	} else if (typeof(ds_element.innerHTML) != 'undefined') {
 		ds_element.innerHTML = ds_format_date(d, m, y);
-	// I don't know how should we display it, just alert it to user.
+	// I don't know how should we display it, just showNotification it to user.
 	} else {
-		alert (ds_format_date(d, m, y));
+		showNotification(ds_format_date(d, m, y), "info");
 	}
 }
 

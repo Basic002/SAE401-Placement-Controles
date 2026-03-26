@@ -5,6 +5,8 @@
 		<link rel="stylesheet" href="public/css/s_index.css">
 		<link rel="stylesheet" href="public/css/s_menu.css">
 		<link rel="stylesheet" href="public/css/s_generique.css">
+		<link rel="stylesheet" href="public/css/s_notifications.css">
+		<script src="public/javascript/notifications.js"></script>
 		<title><?= isset($titre_page) ? $titre_page : "Accueil" ?></title>
 	</head>
 	<body>

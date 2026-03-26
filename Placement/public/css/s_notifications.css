@@ -1,0 +1,31 @@
+.notification-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f44336; /* Red for errors by default */
+    color: white;
+    padding: 16px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    font-family: Arial, sans-serif;
+    max-width: 300px;
+}
+
+.notification-toast.show {
+    opacity: 1;
+}
+
+.notification-toast.success {
+    background-color: #4CAF50;
+}
+
+.notification-toast.warning {
+    background-color: #ff9800;
+}
+
+.notification-toast.info {
+    background-color: #2196F3;
+}

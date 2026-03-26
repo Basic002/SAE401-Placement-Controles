@@ -11,7 +11,7 @@
 		}
 		else
 		{
-			echo '<script>alert("Matiere deja existante")</script>';
+			echo '<script>showNotification("Matiere deja existante", "error")</script>';
 		}
 	}
 	
