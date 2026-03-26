@@ -34,7 +34,7 @@
 			}
 		else
 		{
-			echo '<script>alert("Promotion déjà existante")</script>';
+			echo '<script>showNotification("Promotion déjà existante", "error")</script>';
 		}
 	}
 
@@ -70,7 +70,7 @@
 		}
 		else
 		{
-			echo '<script>alert("Groupe déjà existant")</script>';
+			echo '<script>showNotification("Groupe déjà existant", "error")</script>';
 		}
 	}
 	
@@ -126,7 +126,7 @@
 		}
 		else
 		{
-			echo '<script>alert("Promotion déjà existante")</script>';
+			echo '<script>showNotification("Promotion déjà existante", "error")</script>';
 		}
 	}
 	
@@ -189,7 +189,7 @@
 			$groupes++;
 		}
 		if ($groupes==0) {
-			echo '<script>alert("Pas de groupe pour cette promotion, import impossible !")</script>';
+			echo '<script>showNotification("Pas de groupe pour cette promotion, import impossible !", "error")</script>';
 
 		}	else {
 			ini_set("auto_detect_line_endings", true);    // pour mac
@@ -208,7 +208,7 @@
 			$ligne = 1; // compteur de ligne
 
 			while ($tab = fgetcsv($fp, 200, ';')) {
-				//echo '<script>alert("in'.count($tab).'")</script>';
+				//echo '<script>showNotification("in'.count($tab).'", "error")</script>';
 
 				$champs = count($tab);//nombre de champs dans la ligne en question
 				$ligne++;
@@ -259,9 +259,9 @@
 
 			fclose($fp);
 			if ($ok > 0)
-				echo '<script>alert("La promotion a bien été importée : ' . $ok . ' étudiants importés.")</script>';
+				echo '<script>showNotification("La promotion a bien été importée : ' . $ok . ' étudiants importés.", "error")</script>';
 			else
-				echo '<script>alert("Aucun étudiant importé : fichier non conforme !")</script>';
+				echo '<script>showNotification("Aucun étudiant importé : fichier non conforme !", "error")</script>';
 		}
 	}
 ?>

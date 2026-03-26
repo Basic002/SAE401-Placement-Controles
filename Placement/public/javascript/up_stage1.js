@@ -85,7 +85,7 @@ function getXhr()
 	else
 	{
 		// XMLHttpRequest non supporté par le navigateur 
-		alert("Votre navigateur ne supporte pas les objets XMLHTTPRequest...");
+		showNotification("Votre navigateur ne supporte pas les objets XMLHTTPRequest...", "error");
 		xhr = false; 
 	} 
 	return xhr;
@@ -189,7 +189,7 @@ function recupCombi()
 				'salle'  : listSalle.value
 			}, function(data){
 				if(data!="ok"){
-					alert("erreur : "+data);
+					showNotification("erreur : "+data, "error");
 				}else{
 					afficheCombi(true);
 				}

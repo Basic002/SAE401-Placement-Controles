@@ -13,7 +13,7 @@
 				$stmt = $pdo->prepare('INSERT INTO matiere (nom_mat, id_promo) VALUES (:nom_mat, :id_promo)');
 				$stmt->execute(['nom_mat' => $_POST['nom_mat'], 'id_promo' => $_POST['prom']]);
 			} else {
-				echo '<script>alert("Matière déja existante")</script>';
+				echo '<script>showNotification("Matière déja existante", "error")</script>';
 			}
 	
 	}

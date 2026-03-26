@@ -44,7 +44,7 @@ include('connexion.php');
 		}
 		else
 		{
-			echo '<script>alert("Enseignant déja existant")</script>';
+			echo '<script>showNotification("Enseignant déja existant", "error")</script>';
 		}
 	}
 	

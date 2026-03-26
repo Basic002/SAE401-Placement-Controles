@@ -14,7 +14,7 @@
 				$insert = $pdo->prepare('INSERT INTO batiment (nom_bat, ad_bat) VALUES (:nom_bat, :ad_bat)');
 				$insert->execute(['nom_bat' => $_POST['nom_bat'], 'ad_bat' => $_POST['ad_bat']]);
 			} else {
-				echo '<script>alert("Bâtiment déjà existant")</script>';
+				echo '<script>showNotification("Bâtiment déjà existant", "error")</script>';
 			}
 		
 	}

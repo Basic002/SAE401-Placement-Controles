@@ -13,7 +13,7 @@
 				$insert = $pdo->prepare('INSERT INTO enseigne (id_mat, id_ens) VALUES (:id_mat, :id_ens)');
 				$insert->execute(['id_mat' => $_POST['mat'], 'id_ens' => $_POST['ens']]);
 			} else {
-				echo '<script>alert("Couple enseignant/matière déjà existant")</script>';
+				echo '<script>showNotification("Couple enseignant/matière déjà existant", "error")</script>';
 			}
 	}
 	

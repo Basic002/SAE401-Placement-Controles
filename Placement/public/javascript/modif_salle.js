@@ -245,7 +245,7 @@ btnSave.addEventListener('click', function(e) {
 var btnCrea2=frCont.getElementById('btncrea');
 
 btnCrea2.addEventListener('click', function(e) {
-  alert("test");
+  showNotification("test", "error");
   //location.replace("index.php?p=crea_salle");
 }, false);
 */

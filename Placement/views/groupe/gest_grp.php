@@ -44,7 +44,7 @@ include('connexion.php');
 					'id_groupe' => $_POST['id_groupe']
 				]);
 			} else {
-				echo '<script>alert("Étudiant déjà existant")</script>';
+				echo '<script>showNotification("Étudiant déjà existant", "error")</script>';
 			}
 		} catch (PDOException $e) {
 			echo 'Error: ' . $e->getMessage();
@@ -81,7 +81,7 @@ include('connexion.php');
 					'id_groupe' => $_POST['id_groupe']
 				]);
 			} else {
-				echo '<script>alert("Groupe déjà existant")</script>';
+				echo '<script>showNotification("Groupe déjà existant", "error")</script>';
 			}
 	}	
 
@@ -119,7 +119,7 @@ include('connexion.php');
 				'id_etudiant' => $_POST['id_etudiant']
 			]);
 		} else {
-			echo '<script>alert("Étudiant déjà existant")</script>';
+			echo '<script>showNotification("Étudiant déjà existant", "error")</script>';
 		}
 	}
 	

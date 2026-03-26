@@ -15,7 +15,7 @@ include('connexion.php');
 		}
 		else
 		{
-			echo '<script>alert("D\351partement d\351j\340 \351xistant")</script>';
+			echo '<script>showNotification("D\351partement d\351j\340 \351xistant", "error")</script>';
 		}
 	}
 	
@@ -41,7 +41,7 @@ include('connexion.php');
 		}
 	else
 		{
-			echo '<script>alert("D\351partement d\351j\340 \351xistant")</script>';
+			echo '<script>showNotification("D\351partement d\351j\340 \351xistant", "error")</script>';
 		}
 	}
 	

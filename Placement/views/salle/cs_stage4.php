@@ -94,7 +94,7 @@
 	if(isset($_POST['Enregistrer']))
 	{
 		saveBDD();
-		// echo "<script>alert('Enregistrement effectué')</script>";
+		// echo "<script>showNotification('Enregistrement effectué', "error")</script>";
 		echo "<script>window.top.document.location.href='index.php?p=gest_salle'</script>";
 	}
 ?>

@@ -48,7 +48,7 @@ function selecTwo(id,a,b)
 				if (contenuA.innerHTML.length <= 10 &&
 					contenuB.innerHTML.length <= 10){
 
-					alert("Il est impossible de déplacer deux places vides !");
+					showNotification("Il est impossible de déplacer deux places vides !", "error");
 					resetSwitch();
 				}else{
 
@@ -89,7 +89,7 @@ function intervertir()
 		if(data){
 			console.log(data);
 			console.log(data.length);
-			alert(data);
+			showNotification(data, "error");
 		}else{
 			const case0=document.getElementById(tabId[0]).innerHTML.split('<br>');
 			const case1=document.getElementById(tabId[1]).innerHTML.split('<br>');
