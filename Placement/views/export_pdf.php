@@ -16,8 +16,10 @@
 	// ######################### LISTE PAR SALLE #########################
 	function creaPDFSalle($idDevoir, $idSalle, $unFichier)
 	{
-		$querySalle=mysql_query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle");
-		$nomSalle=mysql_result($querySalle, 0);
+		global $pdo;
+		$stmtSalle = $pdo->prepare("SELECT nom_salle FROM salle WHERE id_salle=:idSalle");
+		$stmtSalle->execute(['idSalle' => $idSalle]);
+		$nomSalle = $stmtSalle->fetchColumn();
 		
 		recupStructSalle($idSalle);
 		numeroPlace();
@@ -88,8 +90,10 @@
 		{
 			if($_SESSION['infoCombi'][$i][2]==$idSalle)
 			{
-				$query1=mysql_query('SELECT nom_mat FROM matiere WHERE id_mat=\''.$_SESSION['infoCombi'][$i][3].'\'');
-				$mat[$nbMat]=utf8_decode(mysql_result($query1, 0, 'nom_mat'));
+				global $pdo;
+				$stmtMat = $pdo->prepare('SELECT nom_mat FROM matiere WHERE id_mat=:idMat');
+				$stmtMat->execute(['idMat' => $_SESSION['infoCombi'][$i][3]]);
+				$mat[$nbMat]=utf8_decode($stmtMat->fetchColumn());
 				$nbMat++;
 			}
 		}
@@ -140,8 +144,10 @@
 	// ######################### LISTE EMARGEMENT PAR SALLE #########################
 	function creaPDFEmarge($idDevoir, $idSalle, $unFichier, $pdf)
 	{
-		$querySalle=mysql_query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle");
-		$nomSalle=mysql_result($querySalle, 0);
+		global $pdo;
+		$stmtSalle = $pdo->prepare("SELECT nom_salle FROM salle WHERE id_salle=:idSalle");
+		$stmtSalle->execute(['idSalle' => $idSalle]);
+		$nomSalle = $stmtSalle->fetchColumn();
 		
 		recupStructSalle($idSalle);
 		numeroPlace();
@@ -192,8 +198,10 @@
 		{
 			if($_SESSION['infoCombi'][$i][2]==$idSalle)
 			{
-				$query1=mysql_query('SELECT nom_mat FROM matiere WHERE id_mat=\''.$_SESSION['infoCombi'][$i][3].'\'');
-				$mat[$nbMat]=utf8_decode(mysql_result($query1, 0, 'nom_mat'));
+				global $pdo;
+				$stmtMat = $pdo->prepare('SELECT nom_mat FROM matiere WHERE id_mat=:idMat');
+				$stmtMat->execute(['idMat' => $_SESSION['infoCombi'][$i][3]]);
+				$mat[$nbMat]=utf8_decode($stmtMat->fetchColumn());
 				$nbMat++;
 			}
 		}
@@ -283,9 +291,12 @@
 	// ######################### LISTE PAR PROMOTION #########################
 	function creaPDFPromo($idDevoir, $idPromo, $pdf)
 	{
-		$queryPromo=mysql_query("SELECT nom_promo, nom_dpt FROM promotion, departement WHERE promotion.id_dpt=departement.id_dpt AND id_promo=$idPromo");
-		$nomPromo=mysql_result($queryPromo, 0, 'nom_promo');
-		$nomDpt=mysql_result($queryPromo, 0, 'nom_dpt');
+		global $pdo;
+		$stmtPromo = $pdo->prepare("SELECT nom_promo, nom_dpt FROM promotion, departement WHERE promotion.id_dpt=departement.id_dpt AND id_promo=:idPromo");
+		$stmtPromo->execute(['idPromo' => $idPromo]);
+		$promoRow = $stmtPromo->fetch();
+		$nomPromo = $promoRow['nom_promo'];
+		$nomDpt = $promoRow['nom_dpt'];
 
 		if ($pdf==null) {
 			$pdf = new Cezpdf('a4', 'portrait');
@@ -328,8 +339,10 @@
 		{
 			if($_SESSION['infoCombi'][$i][2]==$idSalle)
 			{
-				$query1=mysql_query('SELECT nom_mat FROM matiere WHERE id_mat=\''.$_SESSION['infoCombi'][$i][3].'\'');
-				$mat[$nbMat]=utf8_decode(mysql_result($query1, 0, 'nom_mat'));
+				global $pdo;
+				$stmtMat = $pdo->prepare('SELECT nom_mat FROM matiere WHERE id_mat=:idMat');
+				$stmtMat->execute(['idMat' => $_SESSION['infoCombi'][$i][3]]);
+				$mat[$nbMat]=utf8_decode($stmtMat->fetchColumn());
 				$nbMat++;
 			}
 		}
