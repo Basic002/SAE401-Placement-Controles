@@ -45,6 +45,10 @@
 
     <div class="bureau">BUREAU</div>
 
+    <form method="POST" action="index.php?action=crea_salle&etape=3" id="formStage">
+        <input type="hidden" id="donnee" name="donnee" value="">
+    </form>
+
 </div>
 
 <script src="public/javascript/crea_salle_s3.js"></script>

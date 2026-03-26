@@ -10,7 +10,7 @@
         <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
-    <div>
+    <form method="POST" action="index.php?action=crea_salle&etape=2" id="formStage">
 
         <div class="champ">
             <label for="nbCol">Nombre de colonnes</label>
@@ -38,6 +38,6 @@
             >
         </div>
 
-    </div>
+    </form>
 
 </div>

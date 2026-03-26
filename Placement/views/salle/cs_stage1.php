@@ -8,7 +8,7 @@
         <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
-    <div>
+    <form method="POST" action="index.php?action=crea_salle&etape=1" id="formStage">
 
         <div class="champ">
             <label for="nomSalle">Nom de la salle</label>
@@ -102,6 +102,6 @@
             <span class="tooltip">Sélectionnez un département</span>
         </div>
 
-    </div>
+    </form>
 
 </div>

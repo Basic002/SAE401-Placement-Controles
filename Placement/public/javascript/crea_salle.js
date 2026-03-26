@@ -244,30 +244,58 @@ btnnext.addEventListener('click', function(e) {
 	{
 		case "stage1":	if(parseInt(checkChamp())==6)
 						{
-                            var nomSalle=document.getElementById("nomSalle");
-                            var rangSalle=document.getElementById("nbRang");
-                            var colSalle=document.getElementById("nbCol");
-                            var batSalle=document.getElementById("batSalle");
-                            var dptSalle=document.getElementById("dptSalle");
-                            var etageSalle=document.getElementById("etageSalle");
-
-                            var url = "cs_stage2.php?var1="+encodeURIComponent(nomSalle.value)+
-                                      "&var2="+encodeURIComponent(rangSalle.value)+
-                                      "&var3="+encodeURIComponent(colSalle.value)+
-                                      "&var4="+encodeURIComponent(batSalle.value)+
-                                      "&var5="+encodeURIComponent(dptSalle.value)+
-                                      "&var6="+encodeURIComponent(etageSalle.value);
+							var form = document.querySelector('form');
+							var formData = new FormData(form);
 							
-                            loadStage(url, "stage2");
+							fetch(form.getAttribute('action'), {
+								method: 'POST',
+								body: formData
+							})
+							.then(response => {
+								if (response.ok) {
+									loadStage("cs_stage2.php", "stage2");
+								} else {
+									console.error('Erreur validation stage 1');
+								}
+							})
+							.catch(err => console.error('Erreur POST stage 1:', err));
 						}
 						break;
 						
-		case "stage2": 	loadStage("cs_stage3.php", "stage3");
+		case "stage2": 	var form = document.querySelector('form');
+						var formData = new FormData(form);
+						
+						fetch(form.getAttribute('action'), {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => {
+							if (response.ok) {
+								loadStage("cs_stage3.php", "stage3");
+							} else {
+								console.error('Erreur validation stage 2');
+							}
+						})
+						.catch(err => console.error('Erreur POST stage 2:', err));
 						break;
 						
 		case "stage3": 	var donnee = buildDonnee();
-						var url = "cs_stage4.php?donnee="+encodeURIComponent(donnee);
-						loadStage(url, "stage4");
+						var form = document.querySelector('form');
+						document.getElementById('donnee').value = donnee;
+						var formData = new FormData(form);
+						
+						fetch(form.getAttribute('action'), {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => {
+							if (response.ok) {
+								loadStage("cs_stage4.php", "stage4");
+							} else {
+								console.error('Erreur validation stage 3');
+							}
+						})
+						.catch(err => console.error('Erreur POST stage 3:', err));
 						break;
 						
 		default: 		break;
