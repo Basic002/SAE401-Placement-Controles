@@ -3,7 +3,7 @@
 /**
  * Modèle pour la table `groupe`.
  *
- * Schéma : id_groupe (PK), nom_groupe, id_promo (FK), nb_etud
+ * Schéma : id_groupe (PK), nom_groupe, id_promo (FK)
  */
 class GroupeModel
 {
@@ -40,7 +40,7 @@ class GroupeModel
     public static function findById(PDO $pdo, int $idGroupe): array|false
     {
         $stmt = $pdo->prepare(
-            'SELECT id_groupe, nom_groupe, id_promo, nb_etud
+            'SELECT id_groupe, nom_groupe, id_promo
                FROM groupe
               WHERE id_groupe = :id_groupe'
         );
@@ -50,7 +50,7 @@ class GroupeModel
 
     /**
      * Retourne les groupes d'une promotion avec le compte réel d'étudiants
-     * (COUNT(*) sur la table etudiant, plus fiable que nb_etud).
+     * (COUNT(*) sur la table etudiant).
      *
      * @param PDO $pdo
      * @param int $idPromo
@@ -59,8 +59,9 @@ class GroupeModel
     public static function findByPromoWithCount(PDO $pdo, int $idPromo): array
     {
         $stmt = $pdo->prepare(
-            'SELECT g.id_groupe, g.nom_groupe, g.id_promo, g.nb_etud,
-                    COUNT(e.id_etudiant) AS nb_etud_reel
+            'SELECT g.id_groupe, g.nom_groupe, g.id_promo,
+                    COUNT(e.id_etudiant) AS nb_etud_reel,
+                    COUNT(e.id_etudiant) AS nb_etud
                FROM groupe g
                LEFT JOIN etudiant e ON g.id_groupe = e.id_groupe
               WHERE g.id_promo = :id_promo
@@ -120,8 +121,8 @@ class GroupeModel
         }
 
         $stmt = $pdo->prepare(
-            'INSERT INTO groupe (nom_groupe, id_promo, nb_etud)
-             VALUES (:nom_groupe, :id_promo, 0)'
+            'INSERT INTO groupe (nom_groupe, id_promo)
+             VALUES (:nom_groupe, :id_promo)'
         );
         $stmt->execute(['nom_groupe' => $nomGroupe, 'id_promo' => $idPromo]);
         return (int) $pdo->lastInsertId();
@@ -165,19 +166,6 @@ class GroupeModel
         return $stmt->execute(['id_groupe' => $idGroupe]);
     }
 
-    /**
-     * Met à jour directement le compteur nb_etud (utilisé lors de l'import CSV).
-     *
-     * @param PDO $pdo
-     * @param int $idGroupe
-     * @param int $nbEtud
-     * @return bool
-     */
-    public static function updateNbEtud(PDO $pdo, int $idGroupe, int $nbEtud): bool
-    {
-        $stmt = $pdo->prepare(
-            'UPDATE groupe SET nb_etud = :nb_etud WHERE id_groupe = :id_groupe'
-        );
-        return $stmt->execute(['nb_etud' => $nbEtud, 'id_groupe' => $idGroupe]);
-    }
+    // Ancienne méthode updateNbEtud supprimée:
+    // le schéma courant ne possède pas la colonne groupe.nb_etud.
 }

@@ -82,13 +82,16 @@ class DevoirModel
     public static function getGroupes(PDO $pdo, int $idDevoir): array
     {
         $stmt = $pdo->prepare(
-            'SELECT g.id_groupe, g.nom_groupe, g.nb_etud, g.id_promo,
+            'SELECT g.id_groupe, g.nom_groupe, g.id_promo,
+                    COUNT(e.id_etudiant) AS nb_etud,
                     p.nom_promo, d.nom_dpt
                FROM groupe g
                JOIN devoir_groupe dg ON g.id_groupe = dg.id_groupe
                JOIN promotion p ON g.id_promo = p.id_promo
                JOIN departement d ON p.id_dpt = d.id_dpt
+               LEFT JOIN etudiant e ON e.id_groupe = g.id_groupe
               WHERE dg.id_devoir = :id_devoir
+              GROUP BY g.id_groupe, g.nom_groupe, g.id_promo, p.nom_promo, d.nom_dpt
               ORDER BY g.nom_groupe ASC'
         );
         $stmt->execute(['id_devoir' => $idDevoir]);

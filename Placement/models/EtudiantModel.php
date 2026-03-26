@@ -177,7 +177,7 @@ class EtudiantModel
     // ------------------------------------------------------------------
 
     /**
-     * Crée un nouvel étudiant et incrémente nb_etud dans son groupe.
+     * Crée un nouvel étudiant.
      * Retourne l'id_etudiant créé, ou false si un doublon est détecté.
      *
      * @param PDO    $pdo
@@ -226,16 +226,11 @@ class EtudiantModel
         ]);
         $newId = (int) $pdo->lastInsertId();
 
-        // Mise à jour du compteur dans le groupe
-        $pdo->prepare('UPDATE groupe SET nb_etud = nb_etud + 1 WHERE id_groupe = :id_groupe')
-            ->execute(['id_groupe' => $idGroupe]);
-
         return $newId;
     }
 
     /**
      * Met à jour les données d'un étudiant.
-     * Gère le cas où le groupe change (mise à jour de nb_etud dans les deux groupes).
      *
      * @param PDO    $pdo
      * @param int    $idEtudiant
@@ -257,9 +252,6 @@ class EtudiantModel
         int $mob_reduite,
         int $demigr
     ): bool {
-        // Récupère l'ancien groupe pour mettre à jour nb_etud si nécessaire
-        $ancien = self::findById($pdo, $idEtudiant);
-
         $stmt = $pdo->prepare(
             'UPDATE etudiant
                 SET nom_etudiant    = :nom,
@@ -280,19 +272,11 @@ class EtudiantModel
             'id_etudiant'  => $idEtudiant,
         ]);
 
-        // Si le groupe a changé, mettre à jour les compteurs
-        if ($ok && $ancien && (int) $ancien['id_groupe'] !== $idGroupe) {
-            $pdo->prepare('UPDATE groupe SET nb_etud = nb_etud - 1 WHERE id_groupe = :id_groupe')
-                ->execute(['id_groupe' => $ancien['id_groupe']]);
-            $pdo->prepare('UPDATE groupe SET nb_etud = nb_etud + 1 WHERE id_groupe = :id_groupe')
-                ->execute(['id_groupe' => $idGroupe]);
-        }
-
         return $ok;
     }
 
     /**
-     * Supprime un étudiant et décrémente nb_etud dans son groupe.
+     * Supprime un étudiant.
      *
      * @param PDO $pdo
      * @param int $idEtudiant
@@ -300,22 +284,12 @@ class EtudiantModel
      */
     public static function delete(PDO $pdo, int $idEtudiant): bool
     {
-        $etud = self::findById($pdo, $idEtudiant);
-
         $stmt = $pdo->prepare('DELETE FROM etudiant WHERE id_etudiant = :id_etudiant');
-        $ok = $stmt->execute(['id_etudiant' => $idEtudiant]);
-
-        if ($ok && $etud) {
-            $pdo->prepare('UPDATE groupe SET nb_etud = nb_etud - 1 WHERE id_groupe = :id_groupe')
-                ->execute(['id_groupe' => $etud['id_groupe']]);
-        }
-
-        return $ok;
+        return $stmt->execute(['id_etudiant' => $idEtudiant]);
     }
 
     /**
      * Supprime tous les étudiants d'une promotion (avant un ré-import CSV).
-     * Remet également nb_etud à 0 pour tous les groupes concernés.
      *
      * @param PDO $pdo
      * @param int $idPromo
@@ -331,11 +305,6 @@ class EtudiantModel
               WHERE g.id_promo = :id_promo'
         );
         $ok = $stmt->execute(['id_promo' => $idPromo]);
-
-        // RAZ des compteurs
-        $pdo->prepare(
-            'UPDATE groupe SET nb_etud = 0 WHERE id_promo = :id_promo'
-        )->execute(['id_promo' => $idPromo]);
 
         return $ok;
     }
