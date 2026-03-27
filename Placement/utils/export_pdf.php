@@ -49,9 +49,12 @@
 		while (ob_get_level() > 0) {
 			ob_end_clean();
 		}
-		$pdf->ezStream([
-			'Content-Disposition' => $filename,
-		]);
+		$content = $pdf->ezOutput();
+		header('Content-Type: application/pdf');
+		header('Content-Disposition: attachment; filename="' . $filename . '"');
+		header('Content-Length: ' . strlen($content));
+		echo $content;
+		exit();
 	}
 
 	function creaPDFPlanSalle(int $idDevoir, int $idSalle): void
