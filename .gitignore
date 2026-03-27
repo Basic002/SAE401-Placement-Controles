@@ -7,3 +7,9 @@ generer_mdp.php
 # Logs
 *.log
 /logs/
+
+.claude/
+node_modules/
+Placement/
+package.json
+package-lock.json
