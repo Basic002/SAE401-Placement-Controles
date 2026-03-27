@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="public/css/s_stage4.css">
 
 <div class="titrecontenu">
-    <a href="index.php?action=gest_salle">
+    <a href="<?= $idDevoir > 0 ? 'index.php?action=placement_stage3' : 'index.php?action=gest_salle' ?>">
         <div class="blocretour" title="Retour"><img class="imgretour" src="public/images/fleche.png"></div>
     </a>
     Salle : <?= htmlspecialchars($salle['nom_salle'], ENT_QUOTES, 'UTF-8') ?>

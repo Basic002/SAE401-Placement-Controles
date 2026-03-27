@@ -41,23 +41,16 @@
 /* ########## MISE EN FORME TABLEAU (grille placement seulement) ########## */
 
 .placement-grid-wrap {
-	overflow-x: auto;
+	overflow-x: visible;
 	max-width: 100%;
 	margin-bottom: 0.5rem;
-	scrollbar-width: none;
-}
-
-.placement-grid-wrap::-webkit-scrollbar {
-	width: 0;
-	height: 0;
 }
 
 table.placement-grid {
 	border-collapse: separate;
-	border-spacing: 3px;
+	border-spacing: 2px;
 	table-layout: fixed;
-	width: max-content;
-	max-width: 100%;
+	width: 100%;
 }
 
 .placeHandi
@@ -94,14 +87,14 @@ table.placement-grid {
 
 table.placement-grid td
 {
-	width: 5.4em;
-	min-width: 4em;
-	max-height: 4.5em;
+	width: auto;
+	min-width: 0;
+	max-height: 4.1em;
 	height: auto;
-	min-height: 2em;
-	padding: 3px 2px;
-	font-size: 0.78rem;
-	line-height: 1.15;
+	min-height: 1.8em;
+	padding: 2px 1px;
+	font-size: 0.72rem;
+	line-height: 1.05;
 	text-align: center;
 	vertical-align: middle;
 	word-break: normal;
