@@ -1,24 +1,10 @@
 // ############ Gestion boutons Precedent/Suivant ############
+var stageContainer = document.getElementById('stage-content');
+var currentStageInput = document.getElementById('currentStageName');
 
-// My Frame
-var myFrame=document.getElementById('myFrame');
-var frCont=myFrame.contentDocument;
-
-// Bouton
-var btnBef=document.getElementById('btnBef');
-var btnModif=document.getElementById('btnModif');
-var btnNext=document.getElementById('btnNext');
-var btnSave=document.getElementById('btnSave');
-
-function recupVar()
-{
-	var myFrame=document.getElementById('myFrame');
-	var frCont=myFrame.contentDocument;
-	var nomSalle=frCont.getElementById("nomSalle");
-	var batSalle=frCont.getElementById("batSalle");
-	var dptSalle=frCont.getElementById("dptSalle");
-	var etageSalle=frCont.getElementById("etageSalle");
-}
+var btnbef=document.getElementById('btnbef');
+var btnnext=document.getElementById('btnnext');
+var btnsave=document.getElementById('btnsave');
 
 function getTooltip(element)
 {
@@ -35,217 +21,223 @@ function getTooltip(element)
 
 function checkChamp()
 {
-	var myFrame=document.getElementById('myFrame');
-	var frCont=myFrame.contentDocument;
-	var nomSalle=frCont.getElementById("nomSalle");
-	var batSalle=frCont.getElementById("batSalle");
-	var dptSalle=frCont.getElementById("dptSalle");
-	var etageSalle=frCont.getElementById("etageSalle");
+	var id_salle=document.getElementById("id_salle");
 	
+    if (!id_salle) return 0; // Sécurité
+
 	var ok=0;
 	
-	// ################ Test nom ################
-	tooltipStyle=getTooltip(nomSalle).style;
-	if(nomSalle.value.length<2)
+	// ################ Test salle ################
+	if(id_salle.value=='')
 	{
-		nomSalle.className="incorrect";
-		tooltipStyle.display='inline-block';
+		id_salle.className="incorrect";
+		ok=0;
 	}
 	else
 	{
-		nomSalle.className="correct";
-		tooltipStyle.display='none';
-		ok++;
-	}
-
-	// ################ Test etage ################
-	tooltipStyle=getTooltip(etageSalle).style;
-	if(etageSalle.value=='A')
-	{
-		etageSalle.className="incorrect";
-		tooltipStyle.display='inline-block';
-	}
-	else
-	{
-		etageSalle.className="correct";
-		tooltipStyle.display='none';
-		ok++;
-	}
-
-	// ################ Test batiment ################
-	tooltipStyle=getTooltip(batSalle).style;
-	if(batSalle.value=='A')
-	{
-		batSalle.className="incorrect";
-		tooltipStyle.display='inline-block';
-	}
-	else
-	{
-		batSalle.className="correct";
-		tooltipStyle.display='none';
-		ok++;
-	}
-
-	// ################ Test departement ################
-	tooltipStyle=getTooltip(dptSalle).style;
-	if(dptSalle.value=='A' && batSalle.value=='3')
-	{
-		dptSalle.className="incorrect";
-		tooltipStyle.display='inline-block';
-	}
-	else
-	{
-		dptSalle.className="correct";
-		tooltipStyle.display='none';
-		ok++;
+		id_salle.className="correct";
+		ok=1;
 	}
 	
 	return ok;
 	
 }
 
+
 // ##### Affichage boutons #####
 
 function affBtn()
 {
-	if(myFrame.name=='stage1')
+    var stage = currentStageInput.value;
+
+	if(stage=='stage1')
 	{
-		btnBef.style.display='none';
-		btnModif.style.display='none';
-		btnNext.style.display='none';
-		btnSave.style.display='none';
+		btnbef.style.display='none';
+		btnnext.style.display='';
+		btnsave.style.display='none';
 	}
-	else if(myFrame.name=='stage2')
+	else if(stage=='stage6')
 	{
-		btnBef.style.display='';
-		btnModif.style.display='';
-		btnNext.style.display='none';
-		btnSave.style.display='none';
+		btnbef.style.display='';
+		btnnext.style.display='none';
+		btnsave.style.display='';
 	}
-	else if(myFrame.name=='stage6')
+	else if(stage=='stage3')
 	{
-		btnBef.style.display='';
-		btnModif.style.display='none';
-		btnNext.style.display='none';
-		btnSave.style.display='';
+		btnbef.style.display='';
+		btnnext.style.display='';
+		btnsave.style.display='none';
 	}
 	else
 	{
-		btnBef.style.display='';
-		btnModif.style.display='none';
-		btnNext.style.display='';
-		btnSave.style.display='none';
+		btnbef.style.display='';
+		btnnext.style.display='';
+		btnsave.style.display='none';
 	}
 }
 
-// #### Gestion source frame ####
+// #### Gestion AJAX et Scripts ####
+
+function executeScripts(container) {
+    var scripts = container.querySelectorAll("script");
+    scripts.forEach(function(oldScript) {
+        var newScript = document.createElement("script");
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+}
+
+function loadStage(stageName, etapeNum) {
+    var url = 'index.php?action=modif_salle&etape=' + etapeNum + '&ajax=1';
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            stageContainer.innerHTML = html;
+            currentStageInput.value = stageName;
+            executeScripts(stageContainer);
+            affBtn();
+        })
+        .catch(err => {
+            console.error('Erreur chargement étape:', err);
+            stageContainer.innerHTML = "<p>Erreur lors du chargement de l'étape.</p>";
+        });
+}
+
+// #### Gestion Navigation ####
+
 
 // Bouton precedent
-btnBef.addEventListener('click', function(e) {
-	var myFrame=document.getElementById('myFrame');
-	var frCont=myFrame.contentDocument;
-	switch(myFrame.name)
+btnbef.addEventListener('click', function(e) {
+    var stage = currentStageInput.value;
+
+	switch(stage)
 	{
-		case "stage2": 	myFrame.name="stage1";
-						myFrame.src="ms_stage1.php";
+		case "stage2": 	loadStage("stage1", 1);
 						break;
 						
-		case "stage3":	myFrame.name="stage2";
-						myFrame.src="ms_stage2.php";
+		case "stage3":	loadStage("stage2", 2);
 						break;
-						 
-		case "stage4":	myFrame.name="stage3";
-						myFrame.src="ms_stage3.php";
+		
+		case "stage4":	loadStage("stage3", 3);
 						break;
 						
-		case "stage5":	myFrame.name="stage4";
-						myFrame.src="ms_stage4.php";
+		case "stage5":	loadStage("stage4", 4);
 						break;
 						
-		case "stage6":	myFrame.name="stage5";
-						myFrame.src="ms_stage5.php";
+		case "stage6":	loadStage("stage5", 5);
 						break;
 						
 		default: 		break;
 	}
-	affBtn();
 }, false);
 
 // Bouton suivant
-btnNext.addEventListener('click', function(e) {
-	var myFrame=document.getElementById('myFrame');
-	var frCont=myFrame.contentDocument;
-
-	var nomSalle=frCont.getElementById("nomSalle");
-	var batSalle=frCont.getElementById("batSalle");
-	var dptSalle=frCont.getElementById("dptSalle");
-	var etageSalle=frCont.getElementById("etageSalle");
+btnnext.addEventListener('click', function(e) {
+    var stage = currentStageInput.value;
 	
-	switch(myFrame.name)
+	switch(stage)
 	{
-		case "stage1":	myFrame.name="stage2";
-						myFrame.src="ms_stage2.php";
-						break;
-						
-		case "stage2": 	myFrame.name="stage3";
-						myFrame.src="ms_stage3.php";
-						break;
-						
-		case "stage3": 	if(parseInt(checkChamp())==4)
+		case "stage1":	if(parseInt(checkChamp())==1)
 						{
-							myFrame.name="stage4";
-							myFrame.src="ms_stage4.php?var1="+nomSalle.value+"&var2="+batSalle.value+"&var3="+dptSalle.value+"&var4="+etageSalle.value;
+							var form = document.querySelector('form');
+							var formData = new FormData(form);
+							
+							fetch(form.getAttribute('action'), {
+								method: 'POST',
+								body: formData
+							})
+							.then(response => {
+								if (response.ok) {
+									loadStage("stage2", 2);
+								} else {
+									console.error('Erreur validation stage 1');
+								}
+							})
+							.catch(err => console.error('Erreur POST stage 1:', err));
 						}
 						break;
 						
-		case "stage4": 	myFrame.name="stage5";
-						myFrame.src="ms_stage5.php";
+		case "stage2": 	var form = document.querySelector('form');
+						var formData = new FormData(form);
+						
+						fetch(form.getAttribute('action'), {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => {
+							if (response.ok) {
+								loadStage("stage3", 3);
+							} else {
+								console.error('Erreur validation stage 2');
+							}
+						})
+						.catch(err => console.error('Erreur POST stage 2:', err));
+						break;
+
+		case "stage3": 	var form = document.querySelector('form');
+						var formData = new FormData(form);
+						
+						fetch(form.getAttribute('action'), {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => {
+							if (response.ok) {
+								loadStage("stage4", 4);
+							} else {
+								console.error('Erreur validation stage 3');
+							}
+						})
+						.catch(err => console.error('Erreur POST stage 3:', err));
 						break;
 						
-		case "stage5": 	myFrame.name="stage6";
-						myFrame.src="ms_stage6.php";
+		case "stage4": 	var donnee = buildDonnee();
+						var form = document.querySelector('form');
+						document.getElementById('donnee').value = donnee;
+						var formData = new FormData(form);
+						
+						fetch(form.getAttribute('action'), {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => {
+							if (response.ok) {
+								loadStage("stage5", 5);
+							} else {
+								console.error('Erreur validation stage 4');
+							}
+						})
+						.catch(err => console.error('Erreur POST stage 4:', err));
+						break;
+
+		case "stage5": 	var form = document.querySelector('form');
+						var formData = new FormData(form);
+						
+						fetch(form.getAttribute('action'), {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => {
+							if (response.ok) {
+								loadStage("stage6", 6);
+							} else {
+								console.error('Erreur validation stage 5');
+							}
+						})
+						.catch(err => console.error('Erreur POST stage 5:', err));
 						break;
 						
 		default: 		break;
 	}
-	affBtn();
-}, false);
-
-// Bouton modifier
-btnModif.addEventListener('click', function(e) {
-
-	var myFrame=document.getElementById('myFrame');
-	var frCont=myFrame.contentDocument;
-	
-	switch(myFrame.name)
-	{
-		case "stage1":	myFrame.name="stage2";
-						myFrame.src="ms_stage2.php";
-						break;
-						
-		case "stage2": 	myFrame.name="stage3";
-						myFrame.src="ms_stage3.php";
-						break;
-						
-		default: 		break;
-	}
-	affBtn();
 }, false);
 
 // Bouton enregistrer
-btnSave.addEventListener('click', function(e) {
-	var myFrame=document.getElementById('myFrame');
-	var frCont=myFrame.contentDocument;
-	var form=frCont.getElementById('formSave');
-	form.submit();
+btnsave.addEventListener('click', function(e) {
+	var form=document.getElementById('formSave');
+    if(form) form.submit();
 }, false);
 
-
-/*
-var btnCrea2=frCont.getElementById('btncrea');
-
-btnCrea2.addEventListener('click', function(e) {
-  showNotification("test", "error");
-  //location.replace("index.php?p=crea_salle");
-}, false);
-*/
+// Initialisation etat boutons
+affBtn();

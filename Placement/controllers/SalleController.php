@@ -265,13 +265,22 @@ class SalleController extends Controller
             6 => 'salle/ms_stage6.php',
         ];
 
-        $this->render($vues[$etape], "Modifier une salle — Étape {$etape}", [
+        // Si c'est une requête AJAX, retourner juste le contenu du stage
+        if (!empty($_GET['ajax'])) {
+            ob_start();
+            include __DIR__ . '/../views/' . $vues[$etape];
+            echo ob_get_clean();
+            return;
+        }
+
+        $this->render('salle/modif_salle.php', "Modifier une salle — Étape {$etape}", [
             'etape'        => $etape,
             'salles'       => $salles,
             'batiments'    => $batiments,
             'departements' => $departements,
             'sessionSalle' => $sessionSalle,
             'erreur'       => $erreur,
+            'stageFile'    => $vues[$etape],
         ]);
     }
 

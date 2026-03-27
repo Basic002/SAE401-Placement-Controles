@@ -67,7 +67,7 @@ $etageLabel = $etages[(int)($sessionSalle['etage'] ?? 0)] ?? (string)($sessionSa
     </table>
 
     <!-- FORMULAIRE D'ENREGISTREMENT -->
-    <form method="POST" action="index.php?action=modif_salle&amp;etape=6">
+    <form method="POST" action="index.php?action=modif_salle&amp;etape=6" id="formSave">
 
         <div class="champ-nav">
             <a href="index.php?action=modif_salle&amp;etape=5" class="btn-retour">← Retour</a>
