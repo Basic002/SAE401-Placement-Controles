@@ -1,4 +1,9 @@
-<?php	
+<?php
+	function toPdfLatin1(string $text): string
+	{
+		return mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
+	}
+
 	// ########################################## Recuperation no place salle ###########################################
 	function numeroPlace()
 	{	
@@ -118,8 +123,8 @@
 		$_SESSION['cpt'] = 0;
 		
 		while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			$_SESSION['data'][$_SESSION['cpt']][0] = utf8_decode($result['nom_etudiant']);
-			$_SESSION['data'][$_SESSION['cpt']][1] = utf8_decode($result['prenom_etudiant']);
+			$_SESSION['data'][$_SESSION['cpt']][0] = toPdfLatin1((string) $result['nom_etudiant']);
+			$_SESSION['data'][$_SESSION['cpt']][1] = toPdfLatin1((string) $result['prenom_etudiant']);
 			$_SESSION['data'][$_SESSION['cpt']][2] = $result['nom_dpt'] . ' ' . $result['nom_promo'];
 			$_SESSION['data'][$_SESSION['cpt']][3] = $result['nom_groupe'];
 			$_SESSION['data'][$_SESSION['cpt']][4] = $result['nom_salle'];
@@ -194,8 +199,8 @@
 		// Recup struct Salle + place
 		recupStructSalle($result['s']);
 		numeroPlace();
-		$_SESSION['data'][$_SESSION['cpt']][0] = utf8_decode($result['nom_etudiant']);
-		$_SESSION['data'][$_SESSION['cpt']][1] = utf8_decode($result['prenom_etudiant']);
+		$_SESSION['data'][$_SESSION['cpt']][0] = toPdfLatin1((string) $result['nom_etudiant']);
+		$_SESSION['data'][$_SESSION['cpt']][1] = toPdfLatin1((string) $result['prenom_etudiant']);
 		$_SESSION['data'][$_SESSION['cpt']][2] = $result['nom_dpt'] . ' ' . $result['nom_promo'];
 		$_SESSION['data'][$_SESSION['cpt']][3] = $result['nom_groupe'];
 		$_SESSION['data'][$_SESSION['cpt']][4] = $result['nom_salle'];
@@ -210,8 +215,8 @@
 				$salle = $result['s'];
 			}
 		
-			$_SESSION['data'][$_SESSION['cpt']][0] = utf8_decode($result['nom_etudiant']);
-			$_SESSION['data'][$_SESSION['cpt']][1] = utf8_decode($result['prenom_etudiant']);
+			$_SESSION['data'][$_SESSION['cpt']][0] = toPdfLatin1((string) $result['nom_etudiant']);
+			$_SESSION['data'][$_SESSION['cpt']][1] = toPdfLatin1((string) $result['prenom_etudiant']);
 			$_SESSION['data'][$_SESSION['cpt']][2] = $result['nom_dpt'] . ' ' . $result['nom_promo'];
 			$_SESSION['data'][$_SESSION['cpt']][3] = $result['nom_groupe'];
 			$_SESSION['data'][$_SESSION['cpt']][4] = $result['nom_salle'];
