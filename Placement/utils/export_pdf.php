@@ -53,7 +53,14 @@
 		while (ob_get_level() > 0) {
 			ob_end_clean();
 		}
-		$content = $pdf->ezOutput();
+		$content = (string) $pdf->ezOutput();
+		// Certains hébergements injectent des caractères avant le vrai flux PDF.
+		// On recale sur la signature PDF au lieu d'échouer immédiatement.
+		$pdfPos = strpos($content, '%PDF');
+		if ($pdfPos !== false && $pdfPos > 0) {
+			$content = substr($content, $pdfPos);
+		}
+		$content = ltrim($content);
 		if ($content === '' || strncmp($content, '%PDF', 4) !== 0) {
 			http_response_code(500);
 			header('Content-Type: text/plain; charset=utf-8');
