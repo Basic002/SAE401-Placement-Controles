@@ -22,8 +22,6 @@ function getTooltip(element)
 function checkChamp()
 {
 	var nomSalle=document.getElementById("nomSalle");
-	var rangSalle=document.getElementById("nbRang");
-	var colSalle=document.getElementById("nbCol");
 	var batSalle=document.getElementById("batSalle");
 	var dptSalle=document.getElementById("dptSalle");
 	var etageSalle=document.getElementById("etageSalle");
@@ -44,34 +42,6 @@ function checkChamp()
 		nomSalle.className="correct";
 		tooltipStyle.display='none';
 		ok++;
-	}
-
-	// ################ Test nbRang ################
-	tooltipStyle=getTooltip(rangSalle).style;
-	if(parseInt(rangSalle.value)>1 && parseInt(rangSalle.value)<30)
-	{
-		rangSalle.className="correct";
-		tooltipStyle.display='none';
-		ok++;
-	}
-	else
-	{
-		rangSalle.className="incorrect";
-		tooltipStyle.display='inline-block';
-	}
-
-	// ################ Test nbColonne ################
-	tooltipStyle=getTooltip(colSalle).style;
-	if(parseInt(colSalle.value)>1 && parseInt(colSalle.value)<30)
-	{
-		colSalle.className="correct";
-		tooltipStyle.display='none';
-		ok++;
-	}
-	else
-	{
-		colSalle.className="incorrect";
-		tooltipStyle.display='inline-block';
 	}
 
 	// ################ Test etage ################

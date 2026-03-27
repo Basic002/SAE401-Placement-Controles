@@ -80,9 +80,11 @@ td:hover
 .bureau
 {
 	text-align: center;
-	margin-top: 20px;
+	margin: 30px auto;
 	font-weight: bold;
 	color: #333;
+	width: 100%;
+	display: block;
 }
 
 /* ########## MISE EN FORME TABLEAU BOUTON ########## */
