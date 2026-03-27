@@ -17,20 +17,17 @@
             <tr>
                 <td><?php echo htmlspecialchars($salle['nom_salle']); ?></td>
                 <td class="btnPDF">
-                    <a target="_blank"
-                       href="index.php?action=export_pdf&varD=1&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
+                    <a href="index.php?action=export_pdf&varD=1&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
                         <img class="imgPDF" src="public/images/loupe.png" alt="Voir liste">
                     </a>
                 </td>
                 <td class="btnPDF">
-                    <a target="_blank"
-                       href="index.php?action=export_pdf&varD=2&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
+                    <a href="index.php?action=export_pdf&varD=2&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
                         <img class="imgPDF" src="public/images/loupe.png" alt="Voir émargement">
                     </a>
                 </td>
                 <td class="btnPDF">
-                    <a target="_blank"
-                       href="index.php?action=visu_salle&id_salle=<?php echo (int)$salle['id_salle']; ?>&id_devoir=<?php echo (int)$idDevoir; ?>">
+                    <a href="index.php?action=export_pdf&varD=4&idDevoir=<?php echo (int)$idDevoir; ?>&idSalle=<?php echo (int)$salle['id_salle']; ?>">
                         <img class="imgPDF" src="public/images/loupe.png" alt="Voir plan">
                     </a>
                 </td>

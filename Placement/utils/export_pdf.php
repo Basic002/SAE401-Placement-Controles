@@ -30,6 +30,111 @@
 		];
 	}
 
+	function parsePlanRows(string $donnee): array
+	{
+		$rows = [];
+		foreach (explode('-', $donnee) as $row) {
+			if ($row !== '') {
+				$rows[] = str_split($row);
+			}
+		}
+		return $rows;
+	}
+
+	function creaPDFPlanSalle(int $idDevoir, int $idSalle): void
+	{
+		global $pdo;
+
+		$stmt = $pdo->prepare("
+			SELECT s.nom_salle, p.donnee
+			FROM salle s
+			JOIN plan p ON p.id_plan = s.id_plan
+			WHERE s.id_salle = :id_salle
+		");
+		$stmt->execute(['id_salle' => $idSalle]);
+		$salleRow = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+		$nomSalle = (string) ($salleRow['nom_salle'] ?? "Salle {$idSalle}");
+		$structure = parsePlanRows((string) ($salleRow['donnee'] ?? ''));
+		if (empty($structure)) {
+			$structure = [['0']];
+		}
+
+		$stmtPlac = $pdo->prepare("
+			SELECT place_x, place_y, nom_etudiant, prenom_etudiant
+			FROM placement pl
+			JOIN etudiant e ON e.id_etudiant = pl.id_etudiant
+			WHERE pl.id_devoir = :id_devoir
+			  AND pl.id_salle = :id_salle
+		");
+		$stmtPlac->execute([
+			'id_devoir' => $idDevoir,
+			'id_salle'  => $idSalle,
+		]);
+
+		$lookup = [];
+		while ($r = $stmtPlac->fetch(PDO::FETCH_ASSOC)) {
+			$key = ((int) $r['place_x']) . ',' . ((int) $r['place_y']);
+			$full = trim(((string) $r['nom_etudiant']) . ' ' . ((string) $r['prenom_etudiant']));
+			$lookup[$key] = mb_convert_encoding($full, 'ISO-8859-1', 'UTF-8');
+		}
+
+		$nbCols = count($structure[0]);
+		$cols = [];
+		for ($c = 0; $c < $nbCols; $c++) {
+			$cols[$c] = 'C' . ($c + 1);
+		}
+
+		$data = [];
+		foreach ($structure as $x => $row) {
+			$line = [];
+			foreach ($row as $y => $cell) {
+				$key = $x . ',' . $y;
+				if (isset($lookup[$key])) {
+					$line[$y] = $lookup[$key];
+				} elseif ((int) $cell === 0) {
+					$line[$y] = ' ';
+				} elseif ((int) $cell === 3) {
+					$line[$y] = '-';
+				} else {
+					$line[$y] = '';
+				}
+			}
+			$data[] = $line;
+		}
+
+		$pdf = new Cezpdf('a4', 'landscape');
+		$pdf->selectFont(__DIR__ . '/../libs/ezpdf/fonts/Helvetica.afm');
+
+		$infoDevoir = getInfosDevoirExport($idDevoir);
+		$conf = ['justification' => 'center'];
+		$pdf->ezText(mb_convert_encoding("Plan de salle {$nomSalle}", 'ISO-8859-1', 'UTF-8'), 14, $conf);
+		$pdf->ezText(
+			$infoDevoir['date'].' - '.$infoDevoir['h'].'h'.$infoDevoir['m']
+			. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8')
+			. $infoDevoir['duree_h'].'h'.$infoDevoir['duree_m'],
+			10,
+			$conf
+		);
+
+		$options = [
+			'showLines' => 1,
+			'showHeadings' => 0,
+			'shaded' => 1,
+			'shadeCol' => [0.95, 0.95, 0.95],
+			'shadeCol2' => [0.88, 0.88, 0.88],
+			'textCol' => [0, 0, 0],
+			'rowGap' => 2,
+			'colGap' => 3,
+			'lineCol' => [1, 1, 1],
+			'xPos' => 'center',
+			'fontSize' => 8,
+			'width' => 800
+		];
+		$pdf->ezTable($data, $cols, ' ', $options);
+		$pdf->ezStream();
+	}
+
 
 // ########################################################################################
 // 						EXPORT LISTE PDF								  #
@@ -483,6 +588,7 @@
 		case '1' : creaPDFSalle($idDevoir, $idSalle); break;
 		case '2' : creaPDFEmarge($idDevoir, $idSalle); break;
 		case '3' : creaPDFPromo($idDevoir, $idPromo); break;
+		case '4' : creaPDFPlanSalle($idDevoir, $idSalle); break;
 		default: break;
 	}
 
