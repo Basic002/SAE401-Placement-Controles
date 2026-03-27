@@ -27,6 +27,7 @@
 			<?php endif; ?>
 					
 			<a id="linkdec" href="index.php?action=util_placement"><div id="btngest" class="btnbar_l">Placement</div></a>
+			<a id="linkdec" href="index.php?action=changer_mdp"><div id="btncpt" class="btnbar_r" style="width:180px">Changer le mot de passe</div></a>
 			<a id="linkdec" href="index.php?action=logout"><div id="btncpt" class="btnbar_r">Déconnexion</div></a>
 		</div>
 		
