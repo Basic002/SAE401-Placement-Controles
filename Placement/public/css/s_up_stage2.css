@@ -88,18 +88,18 @@ table.placement-grid {
 
 table.placement-grid td
 {
-	width: 4.75em;
-	min-width: 3.25em;
+	width: 5.4em;
+	min-width: 4em;
 	max-height: 4.5em;
 	height: auto;
 	min-height: 2em;
 	padding: 3px 2px;
-	font-size: 0.72rem;
+	font-size: 0.78rem;
 	line-height: 1.15;
 	text-align: center;
 	vertical-align: middle;
-	word-break: break-word;
-	overflow-wrap: anywhere;
+	word-break: normal;
+	overflow-wrap: break-word;
 	box-sizing: border-box;
 }
 

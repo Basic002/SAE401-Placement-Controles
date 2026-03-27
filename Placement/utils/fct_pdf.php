@@ -33,7 +33,7 @@
 	// ########################################## Recuperation structure salle ###########################################
 	function recupStructSalle($idSalle)
 	{
-		include('../connexion.php');
+		require_once __DIR__ . '/../config/connexion.php';
 		// Requete
 		$stmt = $pdo->prepare('SELECT * FROM plan, salle WHERE plan.id_plan = salle.id_plan AND id_salle = :idSalle');
 		$stmt->execute(['idSalle' => $idSalle]);
@@ -71,7 +71,7 @@
 	// ############################## Recupere tous les etudiants d'une salle pour un devoir ##############################
 	function recupListeSalle($idDevoir, $idSalle)
 	{
-		include('../connexion.php');
+		require_once __DIR__ . '/../config/connexion.php';
 		$pdo->exec("CREATE TEMPORARY TABLE R1
 					SELECT etudiant.id_etudiant, id_salle
 					FROM etudiant, devoir_groupe
@@ -125,7 +125,7 @@
 	// ############################## Recupere tout les etudiants d'une promo pour un devoir ##############################
 	function recupListePromo($idDevoir, $idPromo)
 	{
-		include('../connexion.php');
+		require_once __DIR__ . '/../config/connexion.php';
 
 		$pdo->exec("CREATE TEMPORARY TABLE R1
 					SELECT id_etudiant, id_salle

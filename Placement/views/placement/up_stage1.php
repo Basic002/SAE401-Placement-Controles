@@ -8,7 +8,11 @@
         <p class="erreur"><?php echo htmlspecialchars($erreur); ?></p>
     <?php endif; ?>
 
-    <form id="formStage1" method="POST" action="index.php?action=placement_stage2">
+    <form id="formStage1" method="POST" action="index.php?action=placement_stage2"
+          data-last-promo="<?php echo (int) ($lastSelection['id_promo'] ?? 0); ?>"
+          data-last-groupe="<?php echo (int) ($lastSelection['id_groupe'] ?? 0); ?>"
+          data-last-salle="<?php echo (int) ($lastSelection['id_salle'] ?? 0); ?>"
+          data-last-matiere="<?php echo (int) ($lastSelection['id_mat'] ?? 0); ?>">
 
         <div class="form-group">
             <label for="date_devoir">Date du devoir</label>
@@ -39,7 +43,8 @@
             <select id="sel_promo" name="id_promo" onchange="grDynamique()">
                 <option value="">-- Promotion --</option>
                 <?php foreach ($promotions as $promo): ?>
-                    <option value="<?php echo (int)$promo['id_promo']; ?>">
+                    <option value="<?php echo (int)$promo['id_promo']; ?>"
+                        <?php echo ((int)($lastSelection['id_promo'] ?? 0) === (int)$promo['id_promo']) ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($promo['nom_dpt'] . ' ' . $promo['nom_promo']); ?>
                     </option>
                 <?php endforeach; ?>
@@ -65,7 +70,8 @@
             <select id="sel_salle" name="id_salle" onchange="affBtn()">
                 <option value="">-- Salle --</option>
                 <?php foreach ($salles as $salle): ?>
-                    <option value="<?php echo (int)$salle['id_salle']; ?>">
+                    <option value="<?php echo (int)$salle['id_salle']; ?>"
+                        <?php echo ((int)($lastSelection['id_salle'] ?? 0) === (int)$salle['id_salle']) ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($salle['nom_salle']); ?>
                     </option>
                 <?php endforeach; ?>

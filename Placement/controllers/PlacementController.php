@@ -68,6 +68,18 @@ class PlacementController extends Controller
         $promotions = PromotionModel::findAll($pdo);
         $salles     = SalleModel::findAllForSelect($pdo);
         $sessionUp  = $_SESSION['up'] ?? [];
+        $lastSelection = $sessionUp['last_selection'] ?? null;
+        if (!$lastSelection && !empty($sessionUp['combinaisons'])) {
+            $lastCombi = end($sessionUp['combinaisons']);
+            if (is_array($lastCombi)) {
+                $lastSelection = [
+                    'id_promo'  => (int) ($lastCombi['id_promo'] ?? 0),
+                    'id_groupe' => (int) ($lastCombi['id_groupe'] ?? 0),
+                    'id_salle'  => (int) ($lastCombi['id_salle'] ?? 0),
+                    'id_mat'    => (int) ($lastCombi['id_mat'] ?? 0),
+                ];
+            }
+        }
 
         $erreur = null;
         if (!empty($_SESSION['up']['placement_flash_erreur'])) {
@@ -80,6 +92,7 @@ class PlacementController extends Controller
             'salles'     => $salles,
             'sessionUp'  => $sessionUp,
             'erreur'     => $erreur,
+            'lastSelection' => $lastSelection,
         ]);
     }
 
@@ -456,6 +469,12 @@ class PlacementController extends Controller
         ];
 
         $_SESSION['up']['combinaisons'] = $combinaisons;
+        $_SESSION['up']['last_selection'] = [
+            'id_promo'  => $idPromo,
+            'id_groupe' => $idGroupe,
+            'id_salle'  => $idSalle,
+            'id_mat'    => $idMat,
+        ];
 
         $this->jsonResponse(['ok' => true, 'combinaisons' => $combinaisons]);
     }
@@ -478,6 +497,17 @@ class PlacementController extends Controller
         if ($index >= 0 && isset($combinaisons[$index])) {
             array_splice($combinaisons, $index, 1);
             $_SESSION['up']['combinaisons'] = array_values($combinaisons);
+            if (!empty($combinaisons)) {
+                $last = end($combinaisons);
+                $_SESSION['up']['last_selection'] = [
+                    'id_promo'  => (int) ($last['id_promo'] ?? 0),
+                    'id_groupe' => (int) ($last['id_groupe'] ?? 0),
+                    'id_salle'  => (int) ($last['id_salle'] ?? 0),
+                    'id_mat'    => (int) ($last['id_mat'] ?? 0),
+                ];
+            } else {
+                unset($_SESSION['up']['last_selection']);
+            }
         }
 
         $this->jsonResponse(['ok' => true, 'combinaisons' => array_values($combinaisons)]);

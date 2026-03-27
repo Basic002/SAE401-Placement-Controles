@@ -1,12 +1,14 @@
 <?php
-	session_start();
-	include('../connexion.php');
-	include('../ezpdf/class.ezpdf.php');
-	include('fct_pdf.php');
+	if (session_status() === PHP_SESSION_NONE) {
+		session_start();
+	}
+	require_once __DIR__ . '/../config/connexion.php';
+	require_once __DIR__ . '/../libs/ezpdf/class.ezpdf.php';
+	require_once __DIR__ . '/fct_pdf.php';
 	
-	$idDevoir=$_GET['idDevoir'];
-	$idSalle=$_GET['idSalle'];
-	$idPromo=$_GET['idPromo'];
+	$idDevoir = (int) ($_GET['idDevoir'] ?? 0);
+	$idSalle  = (int) ($_GET['idSalle'] ?? 0);
+	$idPromo  = (int) ($_GET['idPromo'] ?? 0);
 
 
 // ########################################################################################
@@ -17,7 +19,7 @@
 	
 	function creaPDFSalle($idDevoir, $idSalle)
 	{
-	include('../connexion.php');
+	require_once __DIR__ . '/../config/connexion.php';
 
 		foreach($pdo->query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle") as $querySalle) {
 			$nomSalle=$querySalle['nom_salle'];
@@ -26,7 +28,7 @@
 		numeroPlace();
 		
 		$pdf= new Cezpdf('a4','portrait');
-		$pdf->selectFont('../ezpdf/fonts/Helvetica.afm');
+		$pdf->selectFont(__DIR__ . '/../libs/ezpdf/fonts/Helvetica.afm');
 		
 		$cols[0]=mb_convert_encoding('Nom', 'ISO-8859-1', 'UTF-8');
 		$cols[1]=mb_convert_encoding('Prénom', 'ISO-8859-1', 'UTF-8');
@@ -148,7 +150,7 @@
 	// ######################### LISTE D'EMARGEMENT PAR SALLE #########################
 	function creaPDFEmarge($idDevoir, $idSalle)
 	{
-include('../connexion.php');
+require_once __DIR__ . '/../config/connexion.php';
 		$querySalle=$pdo->query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle");
 		$nomSalle=$querySalle->fetch()['nom_salle'];
 		
@@ -156,7 +158,7 @@ include('../connexion.php');
 		numeroPlace();
 		
 		$pdf= new Cezpdf('a4','portrait');
-		$pdf->selectFont('../ezpdf/fonts/Helvetica.afm');
+		$pdf->selectFont(__DIR__ . '/../libs/ezpdf/fonts/Helvetica.afm');
 
 		$cols[0]='       Signature       ';		
 		$cols[1]=mb_convert_encoding('Nom', 'ISO-8859-1', 'UTF-8');
@@ -290,7 +292,7 @@ include('../connexion.php');
 	// ######################### LISTE PAR PROMOTION #########################
 	function creaPDFPromo($idDevoir, $idPromo)
 	{
-include('../connexion.php');
+require_once __DIR__ . '/../config/connexion.php';
 		$queryPromo=$pdo->query("SELECT nom_promo, nom_dpt 
 					FROM promotion, departement 
 					WHERE promotion.id_dpt=departement.id_dpt 
@@ -299,7 +301,7 @@ include('../connexion.php');
 		$nomDpt=$queryPromo[0]['nom_dpt'];
 		
 		$pdf= new Cezpdf('a4','portrait');
-		$pdf->selectFont('../ezpdf/fonts/Helvetica.afm');
+		$pdf->selectFont(__DIR__ . '/../libs/ezpdf/fonts/Helvetica.afm');
 		
 		$cols[0]=mb_convert_encoding('Nom', 'ISO-8859-1', 'UTF-8');
 		$cols[1]=mb_convert_encoding('Prénom', 'ISO-8859-1', 'UTF-8');
@@ -430,7 +432,8 @@ include('../connexion.php');
 //header('Content-Disposition: attachment;; filename="file.pdf"');
 	
 	// CHOIX LISTE PDF
-	switch($_GET['varD'])
+	$varD = (string) ($_GET['varD'] ?? '');
+	switch($varD)
 	{
 		case '1' : creaPDFSalle($idDevoir, $idSalle); break;
 		case '2' : creaPDFEmarge($idDevoir, $idSalle); break;

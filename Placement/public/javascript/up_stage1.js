@@ -167,6 +167,41 @@ function escHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
+async function restaurerDerniereSelection() {
+    const form = document.getElementById('formStage1');
+    if (!form) return;
+
+    const lastPromo = form.dataset.lastPromo || '';
+    const lastGroupe = form.dataset.lastGroupe || '0';
+    const lastSalle = form.dataset.lastSalle || '';
+    const lastMatiere = form.dataset.lastMatiere || '';
+
+    const selPromo = document.getElementById('sel_promo');
+    const selGroupe = document.getElementById('sel_groupe');
+    const selMatiere = document.getElementById('sel_matiere');
+    const selSalle = document.getElementById('sel_salle');
+
+    if (lastSalle && selSalle) {
+        selSalle.value = lastSalle;
+    }
+
+    if (!lastPromo || !selPromo) {
+        updateSubmitState();
+        return;
+    }
+
+    selPromo.value = lastPromo;
+    await grDynamique();
+
+    if (selGroupe) {
+        selGroupe.value = lastGroupe;
+    }
+    if (selMatiere) {
+        selMatiere.value = lastMatiere;
+    }
+    updateSubmitState();
+}
+
 // Load existing combinaisons on page load
 (async function () {
     try {
@@ -176,6 +211,7 @@ function escHtml(str) {
     } catch (e) {
         renderCombi([]);
     }
+    await restaurerDerniereSelection();
 })();
 
 document.getElementById('formStage1')?.addEventListener('submit', function (e) {

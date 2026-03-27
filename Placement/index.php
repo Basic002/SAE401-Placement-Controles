@@ -208,6 +208,10 @@ switch ($action) {
         (new PlacementController())->ajaxIntervertir();
         break;
 
+    case 'export_pdf':
+        require_once __DIR__ . '/utils/export_pdf.php';
+        break;
+
     // =================== 404 ================================
     default:
         http_response_code(404);
