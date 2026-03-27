@@ -10,6 +10,26 @@
 	$idSalle  = (int) ($_GET['idSalle'] ?? 0);
 	$idPromo  = (int) ($_GET['idPromo'] ?? 0);
 
+	function getInfosDevoirExport(int $idDevoir): array
+	{
+		global $pdo;
+		$stmt = $pdo->prepare("SELECT date_devoir, heure_devoir, duree_devoir FROM devoir WHERE id_devoir = :id_devoir");
+		$stmt->execute(['id_devoir' => $idDevoir]);
+		$row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+		$date = (string) ($row['date_devoir'] ?? '');
+		$heure = (string) ($row['heure_devoir'] ?? '00:00:00');
+		$duree = (string) ($row['duree_devoir'] ?? '00:00:00');
+
+		return [
+			'date'   => $date,
+			'h'      => substr($heure, 0, 2) ?: '00',
+			'm'      => substr($heure, 3, 2) ?: '00',
+			'duree_h'=> substr($duree, 0, 2) ?: '00',
+			'duree_m'=> substr($duree, 3, 2) ?: '00',
+		];
+	}
+
 
 // ########################################################################################
 // 						EXPORT LISTE PDF								  #
@@ -22,9 +42,9 @@
 		global $pdo;
 		require_once __DIR__ . '/../config/connexion.php';
 
-		foreach($pdo->query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle") as $querySalle) {
-			$nomSalle=$querySalle['nom_salle'];
-		}
+		$stmtSalle = $pdo->prepare("SELECT nom_salle FROM salle WHERE id_salle = :id_salle");
+		$stmtSalle->execute(['id_salle' => $idSalle]);
+		$nomSalle = (string) ($stmtSalle->fetchColumn() ?: "Salle {$idSalle}");
 		recupStructSalle($idSalle);
 		numeroPlace();
 		
@@ -91,20 +111,22 @@
 		$nbMat=0;
 		$mat=array(array());
 		
-		for($i=0; $i<$_SESSION['nbCombi']; $i++)
+		$nbCombi = (int) ($_SESSION['nbCombi'] ?? 0);
+		for($i=0; $i<$nbCombi; $i++)
 		{
-			if($_SESSION['infoCombi'][$i][2]==$idSalle)
+			if(($_SESSION['infoCombi'][$i][2] ?? null) == $idSalle)
 			{
 				$query1=$pdo->prepare('SELECT nom_mat, nom_promo 
 					FROM matiere, promotion 
 					WHERE matiere.id_promo = promotion.id_promo 
 					AND id_mat=:id_mat');
-				$query1->execute(['id_mat'=>$_SESSION['infoCombi'][$i][3]]);
+				$query1->execute(['id_mat'=>(int) ($_SESSION['infoCombi'][$i][3] ?? 0)]);
 				$res=$query1->fetch(PDO::FETCH_ASSOC);
-				$mat[$nbMat][0]=mb_convert_encoding($res['nom_mat'], 'ISO-8859-1', 'UTF-8');
-				$mat[$nbMat][1]=mb_convert_encoding($res['nom_promo'], 'ISO-8859-1', 'UTF-8');
-
-				$nbMat++;
+				if ($res) {
+					$mat[$nbMat][0]=mb_convert_encoding((string) $res['nom_mat'], 'ISO-8859-1', 'UTF-8');
+					$mat[$nbMat][1]=mb_convert_encoding((string) $res['nom_promo'], 'ISO-8859-1', 'UTF-8');
+					$nbMat++;
+				}
 			}
 		}
 		
@@ -133,10 +155,14 @@
 		$pdf->ezText($titleMat, 10, $conf);
 		
 		// Date format europeen
-		$date=$_SESSION['dateDevoir'];
-		
-		// Date heure
-		$pdf->ezText($date.' - '.$_SESSION['hDevoir']."h".$_SESSION['mDevoir']. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8').$_SESSION['hDuree']."h".$_SESSION['mDuree'] , 10, $conf);
+		$infoDevoir = getInfosDevoirExport($idDevoir);
+		$pdf->ezText(
+			$infoDevoir['date'].' - '.$infoDevoir['h'].'h'.$infoDevoir['m']
+			. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8')
+			. $infoDevoir['duree_h'].'h'.$infoDevoir['duree_m'],
+			10,
+			$conf
+		);
 		
 	//echo "PLD ";print_r($data);echo " /PLD";
 	//echo "PLC ";print_r($cols);echo " /PLC";
@@ -153,8 +179,9 @@
 	{
 		global $pdo;
 		require_once __DIR__ . '/../config/connexion.php';
-		$querySalle=$pdo->query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle");
-		$nomSalle=$querySalle->fetch()['nom_salle'];
+		$stmtSalle = $pdo->prepare("SELECT nom_salle FROM salle WHERE id_salle = :id_salle");
+		$stmtSalle->execute(['id_salle' => $idSalle]);
+		$nomSalle = (string) ($stmtSalle->fetchColumn() ?: "Salle {$idSalle}");
 		
 		recupStructSalle($idSalle);
 		numeroPlace();
@@ -198,20 +225,22 @@
 		$nbMat=0;
 		$mat=array(array());
 		
-		for($i=0; $i<$_SESSION['nbCombi']; $i++)
+		$nbCombi = (int) ($_SESSION['nbCombi'] ?? 0);
+		for($i=0; $i<$nbCombi; $i++)
 		{
-			if($_SESSION['infoCombi'][$i][2]==$idSalle)
+			if(($_SESSION['infoCombi'][$i][2] ?? null) == $idSalle)
 			{
 				$query1=$pdo->prepare('SELECT nom_mat, nom_promo 
 					FROM matiere, promotion 
 					WHERE matiere.id_promo = promotion.id_promo 
 					AND id_mat=:id_mat');
-				$query1->execute(['id_mat'=>$_SESSION['infoCombi'][$i][3]]);
+				$query1->execute(['id_mat'=>(int) ($_SESSION['infoCombi'][$i][3] ?? 0)]);
 				$res=$query1->fetch(PDO::FETCH_ASSOC);
-				$mat[$nbMat][0]=mb_convert_encoding($res['nom_mat'], 'ISO-8859-1', 'UTF-8');
-				$mat[$nbMat][1]=mb_convert_encoding($res['nom_promo'], 'ISO-8859-1', 'UTF-8');
-
-				$nbMat++;
+				if ($res) {
+					$mat[$nbMat][0]=mb_convert_encoding((string) $res['nom_mat'], 'ISO-8859-1', 'UTF-8');
+					$mat[$nbMat][1]=mb_convert_encoding((string) $res['nom_promo'], 'ISO-8859-1', 'UTF-8');
+					$nbMat++;
+				}
 			}
 		}
 		
@@ -250,10 +279,14 @@
 		$pdf->ezText($titleMat, 10, $conf);
 		
 		// Date format europeen
-		$date=$_SESSION['dateDevoir'];
-		
-		// Date heure
-		$pdf->ezText($date.' - '.$_SESSION['hDevoir']."h".$_SESSION['mDevoir']. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8').$_SESSION['hDuree']."h".$_SESSION['mDuree'] , 10, $conf);
+		$infoDevoir = getInfosDevoirExport($idDevoir);
+		$pdf->ezText(
+			$infoDevoir['date'].' - '.$infoDevoir['h'].'h'.$infoDevoir['m']
+			. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8')
+			. $infoDevoir['duree_h'].'h'.$infoDevoir['duree_m'],
+			10,
+			$conf
+		);
 
 		
 		$options=array(
@@ -296,12 +329,14 @@
 	{
 		global $pdo;
 		require_once __DIR__ . '/../config/connexion.php';
-		$queryPromo=$pdo->query("SELECT nom_promo, nom_dpt 
-					FROM promotion, departement 
-					WHERE promotion.id_dpt=departement.id_dpt 
-					AND id_promo=$idPromo");
-		$nomPromo=$queryPromo[0]['nom_promo'];
-		$nomDpt=$queryPromo[0]['nom_dpt'];
+		$stmtPromo = $pdo->prepare("SELECT p.nom_promo, d.nom_dpt
+					FROM promotion p
+					JOIN departement d ON p.id_dpt = d.id_dpt
+					WHERE p.id_promo = :id_promo");
+		$stmtPromo->execute(['id_promo' => $idPromo]);
+		$promoRow = $stmtPromo->fetch(PDO::FETCH_ASSOC) ?: [];
+		$nomPromo = (string) ($promoRow['nom_promo'] ?? "Promo {$idPromo}");
+		$nomDpt = (string) ($promoRow['nom_dpt'] ?? '');
 		
 		$pdf= new Cezpdf('a4','portrait');
 		$pdf->selectFont(__DIR__ . '/../libs/ezpdf/fonts/Helvetica.afm');
@@ -345,7 +380,8 @@
 		$nbMat=0;
 		$mat=array();
 		
-		for($i=0; $i<$_SESSION['nbCombi']; $i++)
+		$nbCombi = (int) ($_SESSION['nbCombi'] ?? 0);
+		for($i=0; $i<$nbCombi; $i++)
 		{
 			//if($_SESSION['infoCombi'][$i][2]==$idSalle) -- pas besoin ici apparemment
 			//{
@@ -354,10 +390,12 @@
 				WHERE matiere.id_promo = promotion.id_promo
 				AND promotion.id_promo = $idPromo
 				AND id_mat=:id_mat");
-				$query1->execute(['id_mat'=>$_SESSION['infoCombi'][$i][3]]);
+				$query1->execute(['id_mat'=>(int) ($_SESSION['infoCombi'][$i][3] ?? 0)]);
 				$res=$query1->fetch(PDO::FETCH_ASSOC);	
-				$mat[$nbMat]=mb_convert_encoding($res['nom_mat'], 'ISO-8859-1', 'UTF-8');
-				$nbMat++;
+				if ($res && !empty($res['nom_mat'])) {
+					$mat[$nbMat]=mb_convert_encoding((string) $res['nom_mat'], 'ISO-8859-1', 'UTF-8');
+					$nbMat++;
+				}
 			//}
 		}
 		
@@ -372,7 +410,7 @@
 		{
 			if($i==0)
 				$delim='';
-			else if ($query2->fetchColumn() == 1)
+			else
 				$delim=' - ';
 				
 			$titleMat=$titleMat.$delim.$mat[$i];
@@ -389,10 +427,14 @@
 		$pdf->ezText($titleMat, 10, $conf);
 		
 		// Date format europeen
-		$date=$_SESSION['dateDevoir'];
-		
-		// Date heure
-		$pdf->ezText($date.' - '.$_SESSION['hDevoir']."h".$_SESSION['mDevoir']. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8').$_SESSION['hDuree']."h".$_SESSION['mDuree'] , 10, $conf);
+		$infoDevoir = getInfosDevoirExport($idDevoir);
+		$pdf->ezText(
+			$infoDevoir['date'].' - '.$infoDevoir['h'].'h'.$infoDevoir['m']
+			. mb_convert_encoding(' - Durée: ', 'ISO-8859-1', 'UTF-8')
+			. $infoDevoir['duree_h'].'h'.$infoDevoir['duree_m'],
+			10,
+			$conf
+		);
 
 		$options=array(
 			// Ligne
