@@ -35,6 +35,17 @@ function latin1(string $text): string
     return mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
 }
 
+function shortPlanName(string $nom, string $prenom): string
+{
+    $nom = trim($nom);
+    $prenom = trim($prenom);
+
+    $nomPart = mb_strtoupper(mb_substr($nom, 0, 10, 'UTF-8'), 'UTF-8');
+    $prenomInitial = $prenom !== '' ? mb_strtoupper(mb_substr($prenom, 0, 1, 'UTF-8'), 'UTF-8') . '.' : '';
+
+    return trim($nomPart . ' ' . $prenomInitial);
+}
+
 function fetchDevoirContext(PDO $pdo, int $idDevoir): array
 {
     $stmt = $pdo->prepare(
@@ -107,7 +118,7 @@ function fetchPlacementMap(PDO $pdo, int $idDevoir, int $idSalle): array
     $map = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $key = ((int) $row['place_x']) . ',' . ((int) $row['place_y']);
-        $map[$key] = trim((string) $row['nom_etudiant'] . ' ' . (string) $row['prenom_etudiant']);
+        $map[$key] = shortPlanName((string) $row['nom_etudiant'], (string) $row['prenom_etudiant']);
     }
     return $map;
 }
@@ -234,7 +245,7 @@ if ($varD === '4') {
     $usableW = 277.0; // A4 landscape width minus margins
     $cellW = max(9.0, floor(($usableW / $colCount) * 10) / 10);
     $cellH = 8.0;
-    $pdf->SetFont('Arial', '', 6);
+    $pdf->SetFont('Arial', '', 5.5);
 
     foreach ($rows as $x => $line) {
         foreach ($line as $y => $cell) {
