@@ -23,32 +23,6 @@
         </div>
 
         <div class="champ">
-            <label for="nbRang">Nombre de rangs</label>
-            <input
-                type="number"
-                id="nbRang"
-                name="nbRang"
-                min="2"
-                max="29"
-                value="<?php echo htmlspecialchars($sessionSalle['nbRang'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            >
-            <span class="tooltip">Entre 2 et 29</span>
-        </div>
-
-        <div class="champ">
-            <label for="nbCol">Nombre de colonnes</label>
-            <input
-                type="number"
-                id="nbCol"
-                name="nbCol"
-                min="2"
-                max="29"
-                value="<?php echo htmlspecialchars($sessionSalle['nbCol'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            >
-            <span class="tooltip">Entre 2 et 29</span>
-        </div>
-
-        <div class="champ">
             <label for="etageSalle">Étage</label>
             <select id="etageSalle" name="etage">
                 <option value="A">— Choisir —</option>
