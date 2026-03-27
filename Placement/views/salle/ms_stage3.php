@@ -17,16 +17,10 @@ $nbCol  = $nbRang > 0 ? strlen($rows[0]) : 0;
 <!-- ##################### IMPORT STYLE ##################### -->
 <link rel="stylesheet" type="text/css" href="public/css/s_stage2.css">
 
-<!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Modifier une salle — Étape 3</div>
+<h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
 
-<!-- ##################### CONTENU PAGE ##################### -->
-<div class="contenu">
-
-    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
-
-    <!-- AFFICHAGE PLAN ACTUEL EN LECTURE SEULE -->
-    <table id="TAB1">
+<!-- AFFICHAGE PLAN ACTUEL EN LECTURE SEULE -->
+<table id="TAB1">
         <?php foreach ($rows as $i => $row): ?>
         <tr id="<?php echo $i; ?>">
             <?php
@@ -48,5 +42,3 @@ $nbCol  = $nbRang > 0 ? strlen($rows[0]) : 0;
         <input type="hidden" name="nb_col"  value="<?php echo $nbCol; ?>">
         <input type="hidden" name="nb_rang" value="<?php echo $nbRang; ?>">
     </form>
-
-</div>

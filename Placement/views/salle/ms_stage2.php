@@ -1,19 +1,13 @@
 <!-- ##################### IMPORT STYLE ##################### -->
 <link rel="stylesheet" type="text/css" href="public/css/s_ms_stage2.css">
 
-<!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Modifier une salle — Étape 2</div>
+<!-- AFFICHAGE ERREUR -->
+<?php if (!empty($erreur)): ?>
+<div class="erreur"><?php echo htmlspecialchars($erreur); ?></div>
+<?php endif; ?>
 
-<!-- ##################### CONTENU PAGE ##################### -->
-<div class="contenu">
-
-    <!-- AFFICHAGE ERREUR -->
-    <?php if (!empty($erreur)): ?>
-    <div class="erreur"><?php echo htmlspecialchars($erreur); ?></div>
-    <?php endif; ?>
-
-    <!-- FORMULAIRE METADONNEES SALLE -->
-    <form method="POST" action="index.php?action=modif_salle&amp;etape=2">
+<!-- FORMULAIRE METADONNEES SALLE -->
+<form method="POST" action="index.php?action=modif_salle&etape=2">
 
         <div class="champ">
             <label for="nom_salle">Nom de la salle :</label>
@@ -70,5 +64,3 @@
         </div>
 
     </form>
-
-</div>

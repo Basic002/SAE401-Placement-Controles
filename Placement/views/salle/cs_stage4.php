@@ -11,15 +11,11 @@ function cellClass($val) {
 ?>
 <link rel="stylesheet" href="public/css/s_stage4.css">
 
-<div class="titrecontenu">Créer une salle — Étape 4</div>
+<h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? '', ENT_QUOTES, 'UTF-8'); ?></h3>
 
-<div class="contenu">
-
-    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? '', ENT_QUOTES, 'UTF-8'); ?></h3>
-
-    <p>
-        Capacité : <strong><?php echo htmlspecialchars((string)($sessionSalle['capacite'] ?? 0), ENT_QUOTES, 'UTF-8'); ?></strong> places
-    </p>
+<p>
+    Capacité : <strong><?php echo htmlspecialchars((string)($sessionSalle['capacite'] ?? 0), ENT_QUOTES, 'UTF-8'); ?></strong> places
+</p>
 
     <?php
     $donnee = $sessionSalle['donnee'] ?? '';
@@ -48,5 +44,3 @@ function cellClass($val) {
     <form method="POST" action="index.php?action=crea_salle&etape=4" id="formSave">
         <input type="hidden" id="donnee" name="donnee" value="<?php echo htmlspecialchars($sessionSalle['donnee'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     </form>
-
-</div>

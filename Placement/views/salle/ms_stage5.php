@@ -18,43 +18,35 @@ $placeHandi = substr_count($donnee, '2');
 <!-- ##################### IMPORT STYLE ##################### -->
 <link rel="stylesheet" type="text/css" href="public/css/s_stage4.css">
 
-<!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Modifier une salle — Étape 5</div>
+<h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
 
-<!-- ##################### CONTENU PAGE ##################### -->
-<div class="contenu">
+<!-- CAPACITE -->
+<p>
+    <strong><?php echo $placeOk; ?></strong> places
+    <?php if ($placeHandi > 0): ?>
+    (+ <strong><?php echo $placeHandi; ?></strong> place<?php echo $placeHandi > 1 ? 's' : ''; ?> PMR)
+    <?php endif; ?>
+</p>
 
-    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
-
-    <!-- CAPACITE -->
-    <p>
-        <strong><?php echo $placeOk; ?></strong> places
-        <?php if ($placeHandi > 0): ?>
-        (+ <strong><?php echo $placeHandi; ?></strong> place<?php echo $placeHandi > 1 ? 's' : ''; ?> PMR)
-        <?php endif; ?>
-    </p>
-
-    <!-- APERCU GRILLE EN LECTURE SEULE -->
-    <table id="TAB1">
-        <?php foreach ($rows as $i => $row): ?>
-        <tr id="<?php echo $i; ?>">
-            <?php
-            $cells = str_split($row);
-            foreach ($cells as $j => $cell):
-                $cls = cellClass((int)$cell);
-            ?>
-            <td class="<?php echo htmlspecialchars($cls); ?>"
-                id="<?php echo $i . '-' . $j; ?>"></td>
-            <?php endforeach; ?>
-        </tr>
+<!-- APERCU GRILLE EN LECTURE SEULE -->
+<table id="TAB1">
+    <?php foreach ($rows as $i => $row): ?>
+    <tr id="<?php echo $i; ?>">
+        <?php
+        $cells = str_split($row);
+        foreach ($cells as $j => $cell):
+            $cls = cellClass((int)$cell);
+        ?>
+        <td class="<?php echo htmlspecialchars($cls); ?>"
+            id="<?php echo $i . '-' . $j; ?>"></td>
         <?php endforeach; ?>
-    </table>
+    </tr>
+    <?php endforeach; ?>
+</table>
 
-    <div class="bureau">BUREAU</div>
+<div class="bureau">BUREAU</div>
 
-    <!-- FORMULAIRE DE VALIDATION -->
-    <form method="POST" action="index.php?action=modif_salle&etape=5">
-        <input type="hidden" name="donnee" value="<?php echo htmlspecialchars($donnee); ?>">
-    </form>
-
-</div>
+<!-- FORMULAIRE DE VALIDATION -->
+<form method="POST" action="index.php?action=modif_salle&etape=5">
+    <input type="hidden" name="donnee" value="<?php echo htmlspecialchars($donnee); ?>">
+</form>

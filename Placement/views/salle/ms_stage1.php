@@ -1,19 +1,13 @@
 <!-- ##################### IMPORT STYLE ##################### -->
 <link rel="stylesheet" type="text/css" href="public/css/s_ms_stage1.css">
 
-<!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Modifier une salle — Étape 1</div>
+<!-- AFFICHAGE ERREUR -->
+<?php if (!empty($erreur)): ?>
+<div class="erreur"><?php echo htmlspecialchars($erreur); ?></div>
+<?php endif; ?>
 
-<!-- ##################### CONTENU PAGE ##################### -->
-<div class="contenu">
-
-    <!-- AFFICHAGE ERREUR -->
-    <?php if (!empty($erreur)): ?>
-    <div class="erreur"><?php echo htmlspecialchars($erreur); ?></div>
-    <?php endif; ?>
-
-    <!-- FORMULAIRE SELECTION SALLE -->
-    <form method="POST" action="index.php?action=modif_salle&amp;etape=1">
+<!-- FORMULAIRE SELECTION SALLE -->
+<form method="POST" action="index.php?action=modif_salle&etape=1">
 
         <div class="champ">
             <label for="id_salle">Salle à modifier :</label>
@@ -27,10 +21,4 @@
             </select>
         </div>
 
-        <div class="champ-submit">
-            <button type="submit">Sélectionner</button>
-        </div>
-
     </form>
-
-</div>

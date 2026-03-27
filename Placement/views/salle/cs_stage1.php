@@ -1,14 +1,10 @@
 <link rel="stylesheet" href="public/css/s_stage1.css">
 
-<div class="titrecontenu">Créer une salle — Étape 1</div>
+<?php if (!empty($erreur)): ?>
+    <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
+<?php endif; ?>
 
-<div class="contenu">
-
-    <?php if (!empty($erreur)): ?>
-        <div class="erreur"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
-    <?php endif; ?>
-
-    <form method="POST" action="index.php?action=crea_salle&etape=1" id="formStage">
+<form method="POST" action="index.php?action=crea_salle&etape=1" id="formStage">
 
         <div class="champ">
             <label for="nomSalle">Nom de la salle</label>
@@ -77,5 +73,3 @@
         </div>
 
     </form>
-
-</div>

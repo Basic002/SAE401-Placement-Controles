@@ -29,45 +29,37 @@ $etageLabel = $etages[(int)($sessionSalle['etage'] ?? 0)] ?? (string)($sessionSa
 <!-- ##################### IMPORT STYLE ##################### -->
 <link rel="stylesheet" type="text/css" href="public/css/s_stage4.css">
 
-<!-- #################### TITRE PRINCIPAL ################### -->
-<div class="titrecontenu">Modifier une salle — Étape 6</div>
+<h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
 
-<!-- ##################### CONTENU PAGE ##################### -->
-<div class="contenu">
+<!-- RECAPITULATIF -->
+<table class="recap">
+    <tr>
+        <th>Bâtiment</th>
+        <td><?php echo htmlspecialchars($nomBat); ?></td>
+    </tr>
+    <tr>
+        <th>Département</th>
+        <td><?php echo htmlspecialchars($nomDpt); ?></td>
+    </tr>
+    <tr>
+        <th>Étage</th>
+        <td><?php echo htmlspecialchars($etageLabel); ?></td>
+    </tr>
+    <tr>
+        <th>Intercalation</th>
+        <td><?php echo (int)($sessionSalle['intercal'] ?? 0) ? 'Oui' : 'Non'; ?></td>
+    </tr>
+    <tr>
+        <th>Capacité</th>
+        <td>
+            <?php echo $placeOk; ?> place<?php echo $placeOk > 1 ? 's' : ''; ?>
+            <?php if ($placeHandi > 0): ?>
+            (+ <?php echo $placeHandi; ?> place<?php echo $placeHandi > 1 ? 's' : ''; ?> PMR)
+            <?php endif; ?>
+        </td>
+    </tr>
+</table>
 
-    <h3><?php echo htmlspecialchars($sessionSalle['nom_salle'] ?? ''); ?></h3>
-
-    <!-- RECAPITULATIF -->
-    <table class="recap">
-        <tr>
-            <th>Bâtiment</th>
-            <td><?php echo htmlspecialchars($nomBat); ?></td>
-        </tr>
-        <tr>
-            <th>Département</th>
-            <td><?php echo htmlspecialchars($nomDpt); ?></td>
-        </tr>
-        <tr>
-            <th>Étage</th>
-            <td><?php echo htmlspecialchars($etageLabel); ?></td>
-        </tr>
-        <tr>
-            <th>Intercalation</th>
-            <td><?php echo (int)($sessionSalle['intercal'] ?? 0) ? 'Oui' : 'Non'; ?></td>
-        </tr>
-        <tr>
-            <th>Capacité</th>
-            <td>
-                <?php echo $placeOk; ?> place<?php echo $placeOk > 1 ? 's' : ''; ?>
-                <?php if ($placeHandi > 0): ?>
-                (+ <?php echo $placeHandi; ?> place<?php echo $placeHandi > 1 ? 's' : ''; ?> PMR)
-                <?php endif; ?>
-            </td>
-        </tr>
-    </table>
-
-    <!-- FORMULAIRE D'ENREGISTREMENT -->
-    <form method="POST" action="index.php?action=modif_salle&etape=6" id="formSave">
-    </form>
-
-</div>
+<!-- FORMULAIRE D'ENREGISTREMENT -->
+<form method="POST" action="index.php?action=modif_salle&etape=6" id="formSave">
+</form>
