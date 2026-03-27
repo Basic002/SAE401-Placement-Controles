@@ -8,6 +8,9 @@
 <!-- ##################### IMPORT STYLE ##################### -->
 <link rel="stylesheet" type="text/css" href="public/css/s_crea_salle.css">
 
+<!-- #################### TITRE PRINCIPAL (MASQUÉ) ################### -->
+<div class="titrecontenu" style="display:none;">Création salle</div>
+
 <!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
 
