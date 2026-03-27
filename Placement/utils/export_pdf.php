@@ -19,7 +19,8 @@
 	
 	function creaPDFSalle($idDevoir, $idSalle)
 	{
-	require_once __DIR__ . '/../config/connexion.php';
+		global $pdo;
+		require_once __DIR__ . '/../config/connexion.php';
 
 		foreach($pdo->query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle") as $querySalle) {
 			$nomSalle=$querySalle['nom_salle'];
@@ -150,7 +151,8 @@
 	// ######################### LISTE D'EMARGEMENT PAR SALLE #########################
 	function creaPDFEmarge($idDevoir, $idSalle)
 	{
-require_once __DIR__ . '/../config/connexion.php';
+		global $pdo;
+		require_once __DIR__ . '/../config/connexion.php';
 		$querySalle=$pdo->query("SELECT nom_salle FROM salle WHERE id_salle=$idSalle");
 		$nomSalle=$querySalle->fetch()['nom_salle'];
 		
@@ -292,7 +294,8 @@ require_once __DIR__ . '/../config/connexion.php';
 	// ######################### LISTE PAR PROMOTION #########################
 	function creaPDFPromo($idDevoir, $idPromo)
 	{
-require_once __DIR__ . '/../config/connexion.php';
+		global $pdo;
+		require_once __DIR__ . '/../config/connexion.php';
 		$queryPromo=$pdo->query("SELECT nom_promo, nom_dpt 
 					FROM promotion, departement 
 					WHERE promotion.id_dpt=departement.id_dpt 

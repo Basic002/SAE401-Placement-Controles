@@ -44,6 +44,12 @@
 	overflow-x: auto;
 	max-width: 100%;
 	margin-bottom: 0.5rem;
+	scrollbar-width: none;
+}
+
+.placement-grid-wrap::-webkit-scrollbar {
+	width: 0;
+	height: 0;
 }
 
 table.placement-grid {
