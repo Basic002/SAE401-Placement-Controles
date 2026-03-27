@@ -70,8 +70,8 @@ class SalleModel
     {
         $stmt = $pdo->prepare(
             'SELECT s.id_salle, s.nom_salle, s.etage, s.capacite, s.intercal,
-                    s.id_bat, s.id_dpt, s.id_plan,
-                    p.donnee
+                    s.type_salle, s.id_bat, s.id_dpt, s.id_plan,
+                    p.donnee, p.capacite_max
                FROM salle s
                JOIN plan p ON s.id_plan = p.id_plan
               WHERE s.id_salle = :id_salle'
