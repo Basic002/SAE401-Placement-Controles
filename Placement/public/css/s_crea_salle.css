@@ -1,3 +1,98 @@
+#stage-content {
+    min-height: 300px;
+    margin-bottom: 40px;
+}
+
+/* ================ NAVIGATION BUTTONS ================ */
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.navigation-buttons button {
+    flex: 1;
+    min-width: 140px;
+}
+
+#btnbef,
+#btnnext,
+#btnsave {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+#btnbef {
+    background-color: #f0ad4e;
+    color: white;
+    order: 1;
+}
+
+#btnbef:hover:not([style*="display:none"]) {
+    background-color: #ec971f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#btnnext {
+    background-color: #5bc0de;
+    color: white;
+    order: 2;
+}
+
+#btnnext:hover:not([style*="display:none"]) {
+    background-color: #46b8da;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#btnsave {
+    background-color: #5cb85c;
+    color: white;
+    order: 2;
+}
+
+#btnsave:hover:not([style*="display:none"]) {
+    background-color: #4cae4c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ================ FOOTER ACTIONS ================ */
+.footer-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-quitter {
+    padding: 12px 30px;
+    background-color: #999;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-quitter:hover {
+    background-color: #777;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 #myFrame
 {
 	height: auto;

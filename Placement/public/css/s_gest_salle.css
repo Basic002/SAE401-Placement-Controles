@@ -1,75 +1,75 @@
 /* ================ ACTIONS HEADER ================ */
 .actions-header {
     margin-bottom: 30px;
-    display: flex;
-    gap: 15px;
+    text-align: center;
 }
 
 .btn-action {
-    padding: 12px 20px;
+    padding: 10px 20px;
     border-radius: 5px;
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
+    font-family: 'Lucida Grande';
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
     display: inline-block;
+    margin: 0 5px;
+    color: white;
 }
 
 .btn-primary {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #999999;
 }
 
 .btn-primary:hover {
-    background-color: #45a049;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
+    background-color: #777777;
 }
 
 .btn-secondary {
-    background-color: #2196F3;
-    color: white;
+    background-color: #BEBEBE;
 }
 
 .btn-secondary:hover {
-    background-color: #0b7dda;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
+    background-color: #999999;
 }
 
 /* ================ TABLEAU ================ */
 .tableau-salles {
-    width: 100%;
+    width: 777px;
+    margin: 20px auto;
     border-collapse: collapse;
     background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    overflow: hidden;
+    border: 1px solid #999999;
 }
 
 .tableau-salles thead {
-    background-color: #333;
+    background-color: #666666;
     color: white;
     font-weight: 600;
+    font-family: 'Lucida Grande';
 }
 
 .tableau-salles thead th {
-    padding: 15px;
+    padding: 12px;
     text-align: left;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 13px;
+    border-right: 1px solid #999999;
+}
+
+.tableau-salles thead th:last-child {
+    border-right: none;
 }
 
 .tableau-salles tbody tr {
-    border-bottom: 1px solid #e0e0e0;
-    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #CCCCCC;
+    font-family: 'Lucida Grande';
+    font-size: 13px;
 }
 
 .tableau-salles tbody tr:hover {
-    background-color: #f5f5f5;
+    background-color: #F5F5F5;
 }
 
 .tableau-salles tbody tr:last-child {
@@ -77,8 +77,12 @@
 }
 
 .tableau-salles tbody td {
-    padding: 12px 15px;
-    font-size: 14px;
+    padding: 10px 12px;
+    border-right: 1px solid #CCCCCC;
+}
+
+.tableau-salles tbody td:last-child {
+    border-right: none;
 }
 
 /* ================ COLONNES ================ */
@@ -104,7 +108,7 @@
 .col-cap {
     width: 15%;
     text-align: center;
-    background-color: #f9f9f9;
+    background-color: #F5F5F5;
 }
 
 .col-actions {
@@ -115,76 +119,35 @@
 /* ================ BOUTONS D'ACTION ================ */
 .btn-view {
     display: inline-block;
-    padding: 8px 12px;
-    background-color: #4CAF50;
+    padding: 6px 10px;
+    background-color: #999999;
     color: white;
-    border-radius: 4px;
+    border-radius: 3px;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.3s ease;
     border: none;
+    font-family: 'Lucida Grande';
 }
 
 .btn-view:hover {
-    background-color: #45a049;
-    transform: scale(1.1);
+    background-color: #777777;
 }
 
 /* ================ NO DATA ================ */
 .no-data {
+    width: 777px;
+    margin: 20px auto;
     text-align: center;
-    padding: 40px 20px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
+    padding: 30px 20px;
+    background-color: #F5F5F5;
+    border: 1px solid #CCCCCC;
     color: #666;
+    font-family: 'Lucida Grande';
+    font-size: 13px;
 }
 
 .no-data p {
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 20px;
-}
-
-/* ================ RESPONSIVE ================ */
-@media (max-width: 768px) {
-    .actions-header {
-        flex-direction: column;
-    }
-
-    .btn-action {
-        width: 100%;
-        text-align: center;
-    }
-
-    .tableau-salles {
-        font-size: 12px;
-    }
-
-    .tableau-salles thead th,
-    .tableau-salles tbody td {
-        padding: 10px;
-    }
-
-    .col-nom {
-        width: 25%;
-    }
-
-    .col-bat {
-        width: 25%;
-    }
-
-    .col-etage {
-        width: 15%;
-    }
-
-    .col-dpt {
-        display: none;
-    }
-
-    .col-cap {
-        width: 20%;
-    }
-
-    .col-actions {
-        width: 15%;
-    }
 }

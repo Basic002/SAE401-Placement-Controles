@@ -25,16 +25,15 @@
 	<input type="hidden" id="currentStageName" value="stage<?php echo htmlspecialchars((string)($etape ?? 1), ENT_QUOTES, 'UTF-8'); ?>">
 
 	<!-- Bouton precedent/suivant -->
-	<button type="button" id="btnbef" style="display:none; float:left; margin-left:20px;">Précédent</button>
-	<button type="button" id="btnnext" style="float: right; margin-right: 20px;">Suivant</button>
-	<button type="button" id="btnsave" style="display:none; float: right; margin-right: 20px;">Enregistrer</button>
+	<div class="navigation-buttons">
+		<button type="button" id="btnbef" style="display:none;">← Précédent</button>
+		<button type="button" id="btnnext">Suivant →</button>
+		<button type="button" id="btnsave" style="display:none;">✓ Enregistrer</button>
+	</div>
 	
-	<br>
-	<br>
-	<br>
-	<center>
-		<a href="index.php?p=gest_salle"><button type="button">Quitter</button></a>
-	</center>
+	<div class="footer-actions">
+		<a href="index.php?action=gest_salle" class="btn-quitter">Quitter</a>
+	</div>
 	
 </div>
 
