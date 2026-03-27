@@ -1,6 +1,13 @@
 #stage-content {
     min-height: 300px;
     margin-bottom: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 15px;
+}
+
+.contenu > #stage-content {
+    padding: 0;
 }
 
 /* ================ NAVIGATION BUTTONS ================ */
@@ -38,6 +45,8 @@
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    flex: 0 1 auto;
+    min-width: 130px;
 }
 
 #btnbef {

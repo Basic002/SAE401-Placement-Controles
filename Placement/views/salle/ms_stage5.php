@@ -53,13 +53,8 @@ $placeHandi = substr_count($donnee, '2');
     <div class="bureau">BUREAU</div>
 
     <!-- FORMULAIRE DE VALIDATION -->
-    <form method="POST" action="index.php?action=modif_salle&amp;etape=5">
+    <form method="POST" action="index.php?action=modif_salle&etape=5">
         <input type="hidden" name="donnee" value="<?php echo htmlspecialchars($donnee); ?>">
-
-        <div class="champ-nav">
-            <a href="index.php?action=modif_salle&amp;etape=4" class="btn-retour">← Retour</a>
-            <button type="submit">Confirmer →</button>
-        </div>
     </form>
 
 </div>

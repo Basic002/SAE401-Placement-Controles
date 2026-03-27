@@ -63,13 +63,8 @@ $rows   = array_values($rows);
     <div class="bureau">BUREAU</div>
 
     <!-- FORMULAIRE DE SOUMISSION -->
-    <form method="POST" action="index.php?action=modif_salle&amp;etape=4" id="formGrille">
+    <form method="POST" action="index.php?action=modif_salle&etape=4">
         <input type="hidden" id="donnee" name="donnee" value="">
-
-        <div class="champ-nav">
-            <a href="index.php?action=modif_salle&amp;etape=3" class="btn-retour">← Retour</a>
-            <button type="submit">Suivant →</button>
-        </div>
     </form>
 
 </div>

@@ -33,7 +33,7 @@ body
 {
 	border-spacing: 4px;
 	margin: 30px auto;
-	display: table;
+	display: inline-table;
 }
 
 .placeHandi

@@ -69,11 +69,6 @@
             </select>
         </div>
 
-        <div class="champ-nav">
-            <a href="index.php?action=modif_salle&amp;etape=1" class="btn-retour">← Retour</a>
-            <button type="submit">Suivant →</button>
-        </div>
-
     </form>
 
 </div>

@@ -44,14 +44,9 @@ $nbCol  = $nbRang > 0 ? strlen($rows[0]) : 0;
     <div class="bureau">BUREAU</div>
 
     <!-- FORMULAIRE — passe nb_col/nb_rang au controleur -->
-    <form method="POST" action="index.php?action=modif_salle&amp;etape=3">
+    <form method="POST" action="index.php?action=modif_salle&etape=3">
         <input type="hidden" name="nb_col"  value="<?php echo $nbCol; ?>">
         <input type="hidden" name="nb_rang" value="<?php echo $nbRang; ?>">
-
-        <div class="champ-nav">
-            <a href="index.php?action=modif_salle&amp;etape=2" class="btn-retour">← Retour</a>
-            <button type="submit">Modifier la grille →</button>
-        </div>
     </form>
 
 </div>
