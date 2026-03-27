@@ -1,3 +1,24 @@
+/* ##################### Boutons action ##################### */
+
+#btncrea, #btnmodif {
+	width: auto;
+	display: inline-block;
+	background: #BEBEBE;
+	color: white;
+	margin: 10px;
+	padding: 10px 20px;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 6px;
+	font-family: 'Lucida Grande';
+	font-weight: bold;
+	transition: background 0.2s;
+}
+
+#btncrea:hover, #btnmodif:hover {
+	background: #999999;
+}
+
 /* ##################### Bloc creation salle ##################### */
 
 #bloccreasal {

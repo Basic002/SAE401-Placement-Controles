@@ -8,18 +8,10 @@
 <div class="contenu">
 
     <!-- BOUTON CREATION SALLE -->
-    <div id="btncrea">Créer une salle</div>
-
-    <!-- BLOC CREATION SALLE -->
-    <div id="bloccreasal" style="display:none">
-        <a href="index.php?action=crea_salle">
-            <button type="button">Créer une salle</button>
-        </a>
-        <button type="button" onclick="document.getElementById('bloccreasal').style.display='none';">Annuler</button>
-    </div>
+    <a href="index.php?action=crea_salle"><div id="btncrea">Créer une salle</div></a>
 
     <!-- BOUTON MODIFICATION SALLE -->
-    <div id="btnmodif">Modifier une salle</div>
+    <a href="index.php?action=modif_salle"><div id="btnmodif">Modifier une salle</div></a>
 
     <!-- BLOC AFFICHAGE TITRE TABLEAU -->
     <?php if (!empty($salles)): ?>
