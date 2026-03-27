@@ -1,13 +1,12 @@
 #stage-content {
     min-height: 300px;
-    margin-bottom: 40px;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0 15px;
+    margin: 0 auto 40px;
+    display: block;
+    clear: both;
 }
 
 .contenu > #stage-content {
-    padding: 0;
+    width: 100%;
 }
 
 /* ================ NAVIGATION BUTTONS ================ */

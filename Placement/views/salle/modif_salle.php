@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" href="public/css/s_crea_salle.css">
 
 <!-- #################### TITRE PRINCIPAL (MASQUÉ) ################### -->
-<div class="titrecontenu" style="display:none;">Modification salle</div>
+<div class="titrecontenu">Modifier une salle</div>
 
 <!-- ##################### CONTENU PAGE ##################### -->
 <div class="contenu">
