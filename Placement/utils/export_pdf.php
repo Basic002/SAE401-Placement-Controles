@@ -2,6 +2,9 @@
 	if (session_status() === PHP_SESSION_NONE) {
 		session_start();
 	}
+	// Les warnings/deprecations cassent le flux binaire PDF (headers déjà envoyés).
+	ini_set('display_errors', '0');
+	error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE & ~E_WARNING);
 	require_once __DIR__ . '/../config/connexion.php';
 	require_once __DIR__ . '/../libs/ezpdf/class.ezpdf.php';
 	require_once __DIR__ . '/fct_pdf.php';
@@ -39,6 +42,16 @@
 			}
 		}
 		return $rows;
+	}
+
+	function streamPdfClean(Cezpdf $pdf, string $filename): void
+	{
+		while (ob_get_level() > 0) {
+			ob_end_clean();
+		}
+		$pdf->ezStream([
+			'Content-Disposition' => $filename,
+		]);
 	}
 
 	function creaPDFPlanSalle(int $idDevoir, int $idSalle): void
@@ -132,7 +145,7 @@
 			'width' => 800
 		];
 		$pdf->ezTable($data, $cols, ' ', $options);
-		$pdf->ezStream();
+		streamPdfClean($pdf, "plan_salle_{$idSalle}_devoir_{$idDevoir}.pdf");
 	}
 
 
@@ -276,7 +289,7 @@
 		$pdf->ezTable($data,$cols,' ',$options);
 
 		// ########################## EXPORT #####################
-		$pdf->ezStream();
+		streamPdfClean($pdf, "liste_salle_{$idSalle}_devoir_{$idDevoir}.pdf");
 	}
 	
 	// ######################### LISTE D'EMARGEMENT PAR SALLE #########################
@@ -425,7 +438,7 @@
 			'maxWidth' => 300
 			);
 		$pdf->ezTable($data,$cols,' ',$options);
-		$pdf->ezStream();
+		streamPdfClean($pdf, "emargement_salle_{$idSalle}_devoir_{$idDevoir}.pdf");
 	
 	}
 	
@@ -573,7 +586,7 @@
 			);
 			
 		$pdf->ezTable($data,$cols,' ',$options);
-		$pdf->ezStream();
+		streamPdfClean($pdf, "liste_promo_{$idPromo}_devoir_{$idDevoir}.pdf");
 	}
 
 // ########################################################################################
