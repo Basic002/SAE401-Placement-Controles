@@ -18,7 +18,8 @@
 
         <h3>Salle : <?php echo htmlspecialchars($data['salle']['nom_salle']); ?></h3>
 
-        <table id="TAB_salle<?php echo (int)$idSalle; ?>">
+        <div class="placement-grid-wrap">
+        <table class="placement-grid" id="TAB_salle<?php echo (int)$idSalle; ?>">
             <?php foreach ($grille as $i => $row): ?>
                 <tr>
                     <?php foreach ($row as $j => $val): ?>
@@ -47,6 +48,7 @@
                 </tr>
             <?php endforeach; ?>
         </table>
+        </div>
 
         <div class="bureau">BUREAU</div>
 

@@ -69,10 +69,17 @@ class PlacementController extends Controller
         $salles     = SalleModel::findAllForSelect($pdo);
         $sessionUp  = $_SESSION['up'] ?? [];
 
+        $erreur = null;
+        if (!empty($_SESSION['up']['placement_flash_erreur'])) {
+            $erreur = (string) $_SESSION['up']['placement_flash_erreur'];
+            unset($_SESSION['up']['placement_flash_erreur']);
+        }
+
         $this->render('placement/up_stage1.php', 'Étape 1 — Paramètres du devoir', [
             'promotions' => $promotions,
             'salles'     => $salles,
             'sessionUp'  => $sessionUp,
+            'erreur'     => $erreur,
         ]);
     }
 
@@ -113,12 +120,11 @@ class PlacementController extends Controller
                     $matiere   = MatiereModel::findById($pdo, $idMat);
 
                     if ($salleData && $promo && $salle && $matiere) {
-                        $intercal         = (int) ($salleData['intercal'] ?? 1);
-                        $capacite         = (int) ($salleData['capacite'] ?? 0);
-                        $placesEffectives = $intercal === 1 ? (int) ceil($capacite / 2) : $capacite;
+                        $placesEffectives = self::placesEffectivesPourSalle($salleData);
                         $nbEtudiants      = EtudiantModel::countByPromoOrGroupe($pdo, $idPromo, $idGroupe);
 
                         if ($nbEtudiants > 0 && $nbEtudiants <= $placesEffectives) {
+                            $intercal = self::placementStepFromSalle($salleData) === 2 ? 1 : 0;
                             $labelPromo = ($promo['nom_dpt'] ?? '') . ' ' . ($promo['nom_promo'] ?? '');
                             if ($idGroupe > 0) {
                                 $groupe      = GroupeModel::findById($pdo, $idGroupe);
@@ -136,6 +142,14 @@ class PlacementController extends Controller
                                 'nom_mat'     => $matiere['nom_mat'] ?? "Matière {$idMat}",
                                 'nb_etud'     => $nbEtudiants,
                             ]];
+                        } elseif ($nbEtudiants > $placesEffectives) {
+                            $_SESSION['up']['placement_flash_erreur'] = sprintf(
+                                'Capacité insuffisante pour cette salle : %d étudiant(s) et seulement %d place(s) utilisables (plan + espacement). Choisissez une autre salle ou réduisez le groupe.',
+                                $nbEtudiants,
+                                $placesEffectives
+                            );
+                            header('Location: index.php?action=placement_stage1');
+                            exit();
                         }
                     }
                 }
@@ -155,12 +169,14 @@ class PlacementController extends Controller
         $placements = [];
         foreach ($sallesUniques as $idSalle) {
             $idsEtudiants = [];
-            $intercal     = 1;
+            $salleData    = SalleModel::getPlanBySalleId($pdo, (int) $idSalle);
+            if (!$salleData) {
+                continue;
+            }
 
             foreach ($combinaisons as $combi) {
                 if ((int) $combi['id_salle'] === (int) $idSalle) {
-                    $intercal = (int) ($combi['intercal'] ?? 1);
-                    $ids      = EtudiantModel::getIdsByPromoOrGroupe(
+                    $ids = EtudiantModel::getIdsByPromoOrGroupe(
                         $pdo,
                         (int) $combi['id_promo'],
                         (int) $combi['id_groupe']
@@ -169,9 +185,20 @@ class PlacementController extends Controller
                 }
             }
 
-            // step = 2 → intercalation (une chaise vide entre deux étudiants)
-            // step = 1 → pas d'intercalation
-            $step   = $intercal === 1 ? 2 : 1;
+            $placesMax = self::placesEffectivesPourSalle($salleData);
+            if (count($idsEtudiants) > $placesMax) {
+                $_SESSION['up']['placement_flash_erreur'] = sprintf(
+                    'Capacité insuffisante pour la salle « %s » : %d étudiant(s) pour %d place(s) avec espacement. Revenez à l’étape 1 pour changer de salle ou de groupe.',
+                    $salleData['nom_salle'] ?? '',
+                    count($idsEtudiants),
+                    $placesMax
+                );
+                header('Location: index.php?action=placement_stage1');
+                exit();
+            }
+
+            // step = 2 : une place sur deux en colonne (amphi / intercalage)
+            $step   = self::placementStepFromSalle($salleData);
             $result = self::calculerPlacement($pdo, (int) $idSalle, $idsEtudiants, $step);
 
             $placements[$idSalle] = array_map(fn($p) => [
@@ -377,10 +404,8 @@ class PlacementController extends Controller
             $this->jsonResponse(['ok' => false, 'message' => 'Salle introuvable.']);
         }
 
-        $intercal         = (int) ($salleData['intercal'] ?? 1);
-        $capacite         = (int) ($salleData['capacite'] ?? 0);
-        // Avec intercalation, places effectives ≈ moitié de la capacité brute
-        $placesEffectives = $intercal === 1 ? (int) ceil($capacite / 2) : $capacite;
+        $placesEffectives = self::placesEffectivesPourSalle($salleData);
+        $intercal         = self::placementStepFromSalle($salleData) === 2 ? 1 : 0;
 
         // Nombre d'étudiants déjà affectés à cette salle
         $nbDejaAffectes = 0;
@@ -503,10 +528,9 @@ class PlacementController extends Controller
             $this->jsonResponse(['ok' => false, 'message' => 'Salle introuvable.']);
         }
 
-        $capacite         = (int) ($salleData['capacite'] ?? 0);
-        $intercal         = (int) ($salleData['intercal'] ?? 1);
-        $placesEffectives = $intercal === 1 ? (int) ceil($capacite / 2) : $capacite;
-        $nbEtudiants      = EtudiantModel::countByPromoOrGroupe($pdo, $idPromo, $idGroupe);
+        $capacite          = (int) ($salleData['capacite'] ?? 0);
+        $placesEffectives  = self::placesEffectivesPourSalle($salleData);
+        $nbEtudiants       = EtudiantModel::countByPromoOrGroupe($pdo, $idPromo, $idGroupe);
 
         $nbDejaAffectes = 0;
         foreach ($_SESSION['up']['combinaisons'] ?? [] as $c) {
@@ -635,6 +659,35 @@ class PlacementController extends Controller
     }
 
     /**
+     * $step = 2 : une colonne sur deux (amphi ou salle avec intercalage en BDD).
+     */
+    private static function placementStepFromSalle(array $salleData): int
+    {
+        $type     = strtoupper((string) ($salleData['type_salle'] ?? ''));
+        $intercal = (int) ($salleData['intercal'] ?? 1);
+        if ($type === 'AMPHI' || $intercal === 1) {
+            return 2;
+        }
+        return 1;
+    }
+
+    /**
+     * Places utilisables pour le contrôle : grille + espacement, plafonnées par plan.capacite_max.
+     */
+    public static function placesEffectivesPourSalle(array $salleData): int
+    {
+        $step      = self::placementStepFromSalle($salleData);
+        $structure = self::parsePlanSalle($salleData['donnee'] ?? '');
+        $places    = self::getPlacesDisponibles($structure, $step);
+        $n         = count($places['standard']) + count($places['pmr']);
+        $capMax    = (int) ($salleData['capacite_max'] ?? 0);
+        if ($capMax > 0) {
+            $n = min($n, $capMax);
+        }
+        return $n;
+    }
+
+    /**
      * Retourne les places libres (en respectant l'espacement $step).
      *
      * @param array<int, array<int, string>> $structure
@@ -651,21 +704,31 @@ class PlacementController extends Controller
             return ['standard' => [], 'pmr' => []];
         }
         $nbColonnes = count($structure[0]);
+        $derniere   = $structure[$nbRangees - 1];
 
-        // Détermine les colonnes utilisables à partir du dernier rang
+        // Colonnes utilisables : pour $step >= 2, pas de « décalage » vers une colonne
+        // voisine (sinon deux étudiants se retrouvent côte à côte).
         $colonnesUtilisables = [];
-        for ($c = 0; $c < $nbColonnes; $c += $step) {
-            if (isset($structure[$nbRangees - 1][$c]) && $structure[$nbRangees - 1][$c] != 0) {
-                $colonnesUtilisables[] = $c;
-            } else {
-                // Cherche la prochaine colonne valide
-                $cTemp = $c + 1;
-                while ($cTemp < $nbColonnes && $structure[$nbRangees - 1][$cTemp] == 0) {
-                    $cTemp++;
+        if ($step >= 2) {
+            for ($c = 0; $c < $nbColonnes; $c += $step) {
+                $cell = $derniere[$c] ?? '0';
+                if ((int) $cell !== 0) {
+                    $colonnesUtilisables[] = $c;
                 }
-                if ($cTemp < $nbColonnes) {
-                    $colonnesUtilisables[] = $cTemp;
-                    $c = $cTemp;
+            }
+        } else {
+            for ($c = 0; $c < $nbColonnes; $c += $step) {
+                if (isset($derniere[$c]) && (int) $derniere[$c] !== 0) {
+                    $colonnesUtilisables[] = $c;
+                } else {
+                    $cTemp = $c + 1;
+                    while ($cTemp < $nbColonnes && (int) ($derniere[$cTemp] ?? '0') === 0) {
+                        $cTemp++;
+                    }
+                    if ($cTemp < $nbColonnes) {
+                        $colonnesUtilisables[] = $cTemp;
+                        $c = $cTemp;
+                    }
                 }
             }
         }
@@ -673,9 +736,10 @@ class PlacementController extends Controller
         // Parcourt la salle du fond vers le bureau
         for ($r = $nbRangees - 1; $r >= 0; $r--) {
             foreach ($colonnesUtilisables as $c) {
-                if ($structure[$r][$c] == 1) {
+                $cell = $structure[$r][$c] ?? '0';
+                if ((int) $cell === 1) {
                     $placesStandard[] = [$r, $c];
-                } elseif ($structure[$r][$c] == 2) {
+                } elseif ((int) $cell === 2) {
                     $placesPmr[] = [$r, $c];
                 }
             }

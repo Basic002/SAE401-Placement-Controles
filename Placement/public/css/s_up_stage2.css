@@ -38,11 +38,20 @@
 }
 
 
-/* ########## MISE EN FORME TABLEAU ########## */
+/* ########## MISE EN FORME TABLEAU (grille placement seulement) ########## */
 
-#TAB1 
-{
-	border-spacing: 4px;
+.placement-grid-wrap {
+	overflow-x: auto;
+	max-width: 100%;
+	margin-bottom: 0.5rem;
+}
+
+table.placement-grid {
+	border-collapse: separate;
+	border-spacing: 3px;
+	table-layout: fixed;
+	width: max-content;
+	max-width: 100%;
 }
 
 .placeHandi
@@ -63,8 +72,8 @@
 .placeInex
 {
 	background: transparent;
-	border: dashed white 2px;
-	width: 21px;
+	border: 2px dashed #ccc;
+	box-sizing: border-box;
 }
 
 .couloir
@@ -77,16 +86,26 @@
 	background: transparent;
 }
 
-td
+table.placement-grid td
 {
-	width: 70px;
-	height: 20px;
-	/* background: #BBB; */
+	width: 4.75em;
+	min-width: 3.25em;
+	max-height: 4.5em;
+	height: auto;
+	min-height: 2em;
+	padding: 3px 2px;
+	font-size: 0.72rem;
+	line-height: 1.15;
+	text-align: center;
+	vertical-align: middle;
+	word-break: break-word;
+	overflow-wrap: anywhere;
+	box-sizing: border-box;
 }
 
-td:hover
+table.placement-grid td:hover
 {
-	background: gray;
+	filter: brightness(0.92);
 }
 
 /* ####### BUREAU ######## */

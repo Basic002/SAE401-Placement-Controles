@@ -17,7 +17,10 @@ function selectionCombiComplete() {
 function updateSubmitState() {
     const btnSuivant = document.getElementById('btnSuivant');
     if (!btnSuivant) return;
-    const peutSoumettre = champsDeBaseComplets() && selectionCombiComplete();
+    const combiPretes = combinaisonsCourantes.length > 0;
+    const peutSoumettre =
+        champsDeBaseComplets() &&
+        (selectionCombiComplete() || combiPretes);
     btnSuivant.disabled = !peutSoumettre;
 }
 
@@ -176,7 +179,7 @@ function escHtml(str) {
 })();
 
 document.getElementById('formStage1')?.addEventListener('submit', function (e) {
-    if (!selectionCombiComplete()) {
+    if (!combinaisonsCourantes.length && !selectionCombiComplete()) {
         e.preventDefault();
         alert('Merci de choisir une promotion, un groupe, une matière et une salle.');
     }
