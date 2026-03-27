@@ -8,6 +8,8 @@ body
 #TAB1 
 {
 	border-spacing: 4px;
+	margin: 30px auto;
+	display: table;
 }
 
 .placeHandi
@@ -53,5 +55,8 @@ td
 	line-height: 30px;
 	display: block;	
 	color: white;
-	border-radius: 8px;	
+	border-radius: 8px;
+	margin: 20px auto;
+	text-align: center;
+	font-weight: bold;
 }

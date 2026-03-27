@@ -1,153 +1,128 @@
-/* ================ ACTIONS HEADER ================ */
-.actions-header {
-    margin-bottom: 30px;
-    text-align: center;
+/* ##################### Bloc creation salle ##################### */
+
+#bloccreasal {
+	width: 777px;
+	height: auto;
+	background: #BEBEBE;
+	color: white;
+	margin: auto;
+	margin-bottom: 30px;
+	text-align: center;
+	padding: 15px;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
 }
 
-.btn-action {
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    font-family: 'Lucida Grande';
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-block;
-    margin: 0 5px;
-    color: white;
+#bloccreasal button {
+	margin: 5px;
+	padding: 8px 20px;
+	background: #999999;
+	color: white;
+	border: none;
+	cursor: pointer;
+	font-family: 'Lucida Grande';
 }
 
-.btn-primary {
-    background-color: #999999;
+#bloccreasal button:hover {
+	background: #777777;
 }
 
-.btn-primary:hover {
-    background-color: #777777;
+/* ##################### Bloc titre tableau ##################### */
+
+#bloctitre {
+	width: 777px;
+	margin: auto;
+	margin-bottom: 5px;
+	display: flex;
 }
 
-.btn-secondary {
-    background-color: #BEBEBE;
+/* ##################### Bloc contenu tableau ##################### */
+
+.contenutab {
+	width: 777px;
+	margin: auto;
+	margin-bottom: 2px;
+	display: flex;
+	border-bottom: 1px solid #999999;
 }
 
-.btn-secondary:hover {
-    background-color: #999999;
+/* ##################### Style des titres et cellules ##################### */
+
+.nomtitre {
+	height: 29px;
+	background: #a8a8a8;
+	float: left;
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	line-height: 29px;
+	color: white;
+	font-family: 'Lucida Grande';
+	font-size: 13px;
+	flex: 1;
+	border-right: 1px solid #999999;
 }
 
-/* ================ TABLEAU ================ */
-.tableau-salles {
-    width: 777px;
-    margin: 20px auto;
-    border-collapse: collapse;
-    background-color: white;
-    border: 1px solid #999999;
+.nomtitre:last-child {
+	border-right: none;
 }
 
-.tableau-salles thead {
-    background-color: #666666;
-    color: white;
-    font-weight: 600;
-    font-family: 'Lucida Grande';
+#bloctitre .nomtitre {
+	background: #666666;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: 12px;
 }
 
-.tableau-salles thead th {
-    padding: 12px;
-    text-align: left;
-    font-size: 13px;
-    border-right: 1px solid #999999;
+.contenutab .nomtitre {
+	background: #a8a8a8;
 }
 
-.tableau-salles thead th:last-child {
-    border-right: none;
+.contenutab:hover .nomtitre {
+	background: #999999;
 }
 
-.tableau-salles tbody tr {
-    border-bottom: 1px solid #CCCCCC;
-    font-family: 'Lucida Grande';
-    font-size: 13px;
+/* ##################### Image action ##################### */
+
+.img-action {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
 }
 
-.tableau-salles tbody tr:hover {
-    background-color: #F5F5F5;
+.img-action:hover {
+	opacity: 0.7;
 }
 
-.tableau-salles tbody tr:last-child {
-    border-bottom: none;
+/* ##################### Aucune salle ##################### */
+
+#nodata {
+	width: 777px;
+	margin: 30px auto;
+	padding: 30px;
+	background: #F5F5F5;
+	text-align: center;
+	border: 1px solid #CCCCCC;
+	font-family: 'Lucida Grande';
+	font-size: 13px;
 }
 
-.tableau-salles tbody td {
-    padding: 10px 12px;
-    border-right: 1px solid #CCCCCC;
+#nodata p {
+	margin: 0 0 15px 0;
+	color: #333;
 }
 
-.tableau-salles tbody td:last-child {
-    border-right: none;
+#nodata button {
+	padding: 8px 20px;
+	background: #999999;
+	color: white;
+	border: none;
+	cursor: pointer;
+	font-family: 'Lucida Grande';
 }
 
-/* ================ COLONNES ================ */
-.col-nom {
-    width: 20%;
-    font-weight: 600;
-    color: #333;
-}
-
-.col-bat {
-    width: 20%;
-}
-
-.col-etage {
-    width: 12%;
-    text-align: center;
-}
-
-.col-dpt {
-    width: 18%;
-}
-
-.col-cap {
-    width: 15%;
-    text-align: center;
-    background-color: #F5F5F5;
-}
-
-.col-actions {
-    width: 10%;
-    text-align: center;
-}
-
-/* ================ BOUTONS D'ACTION ================ */
-.btn-view {
-    display: inline-block;
-    padding: 6px 10px;
-    background-color: #999999;
-    color: white;
-    border-radius: 3px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    border: none;
-    font-family: 'Lucida Grande';
-}
-
-.btn-view:hover {
-    background-color: #777777;
-}
-
-/* ================ NO DATA ================ */
-.no-data {
-    width: 777px;
-    margin: 20px auto;
-    text-align: center;
-    padding: 30px 20px;
-    background-color: #F5F5F5;
-    border: 1px solid #CCCCCC;
-    color: #666;
-    font-family: 'Lucida Grande';
-    font-size: 13px;
-}
-
-.no-data p {
-    font-size: 14px;
-    margin-bottom: 20px;
+#nodata button:hover {
+	background: #777777;
 }

@@ -3,11 +3,37 @@ body
 	font-family: "Lucida Grande", Arial;
 }
 
-/* ########## MISE EN FORME TABLEAU ########## */
+/* ########## GROUPE DE SÉLECTION ########## */
+
+.radio-groupe {
+	text-align: center;
+	margin: 20px 0 30px 0;
+	padding: 15px;
+	background-color: #F5F5F5;
+	border: 1px solid #CCCCCC;
+	border-radius: 5px;
+}
+
+.radio-groupe label {
+	display: inline-block;
+	margin: 0 15px;
+	font-size: 14px;
+	font-family: 'Lucida Grande';
+	cursor: pointer;
+}
+
+.radio-groupe input[type="radio"] {
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+/* ########## MISE EN FORME GRILLE ########## */
 
 #TAB1 
 {
 	border-spacing: 4px;
+	margin: 30px auto;
+	display: table;
 }
 
 .placeHandi
@@ -47,6 +73,16 @@ td
 td:hover
 {
 	background: gray;
+}
+
+/* ########## PRÉVISUALISATION BUREAU ########## */
+
+.bureau
+{
+	text-align: center;
+	margin-top: 20px;
+	font-weight: bold;
+	color: #333;
 }
 
 /* ########## MISE EN FORME TABLEAU BOUTON ########## */
