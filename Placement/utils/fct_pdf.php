@@ -74,32 +74,44 @@
 	{
 		global $pdo;
 		require_once __DIR__ . '/../config/connexion.php';
-		$pdo->exec("CREATE TEMPORARY TABLE R1
-					SELECT etudiant.id_etudiant, id_salle
-					FROM etudiant, devoir_groupe
-					WHERE etudiant.id_groupe=devoir_groupe.id_groupe
-					AND devoir_groupe.id_devoir=$idDevoir
-					AND devoir_groupe.id_salle=$idSalle
-					UNION
-					SELECT etudiant.id_etudiant, id_salle
-					FROM etudiant, devoir_promo, groupe
-					WHERE etudiant.id_groupe=groupe.id_groupe
-					AND groupe.id_promo=devoir_promo.id_promo
-					AND devoir_promo.id_devoir=$idDevoir
-					AND devoir_promo.id_salle=$idSalle
-				");
-				
-		$stmt = $pdo->prepare("SELECT nom_etudiant, prenom_etudiant, nom_groupe, nom_promo, nom_dpt, nom_salle, place_x, place_y
-							   FROM R1, placement, groupe, etudiant, salle, promotion, departement
-							   WHERE R1.id_etudiant=placement.id_etudiant
-							   AND R1.id_etudiant=etudiant.id_etudiant
-							   AND R1.id_salle=salle.id_salle
-							   AND etudiant.id_groupe=groupe.id_groupe
-							   AND groupe.id_promo=promotion.id_promo
-							   AND promotion.id_dpt=departement.id_dpt
-							   AND id_devoir=:idDevoir
-							   ORDER BY nom_etudiant");
-		$stmt->execute(['idDevoir' => $idDevoir]);
+		$stmt = $pdo->prepare("
+			SELECT DISTINCT
+				e.nom_etudiant,
+				e.prenom_etudiant,
+				g.nom_groupe,
+				p.nom_promo,
+				d.nom_dpt,
+				s.nom_salle,
+				pl.place_x,
+				pl.place_y
+			FROM placement pl
+			JOIN etudiant e ON e.id_etudiant = pl.id_etudiant
+			JOIN groupe g ON g.id_groupe = e.id_groupe
+			JOIN promotion p ON p.id_promo = g.id_promo
+			JOIN departement d ON d.id_dpt = p.id_dpt
+			JOIN salle s ON s.id_salle = pl.id_salle
+			WHERE pl.id_devoir = :idDevoir
+			  AND pl.id_salle = :idSalle
+			  AND (
+					EXISTS (
+						SELECT 1
+						FROM devoir_groupe dg
+						WHERE dg.id_devoir = pl.id_devoir
+						  AND dg.id_groupe = e.id_groupe
+					)
+					OR EXISTS (
+						SELECT 1
+						FROM devoir_promo dp
+						WHERE dp.id_devoir = pl.id_devoir
+						  AND dp.id_promo = g.id_promo
+					)
+			  )
+			ORDER BY e.nom_etudiant
+		");
+		$stmt->execute([
+			'idDevoir' => $idDevoir,
+			'idSalle'  => $idSalle,
+		]);
 		
 		// RAZ Variables
 		$_SESSION['data'] = array(array());
@@ -129,34 +141,45 @@
 	{
 		global $pdo;
 		require_once __DIR__ . '/../config/connexion.php';
-
-		$pdo->exec("CREATE TEMPORARY TABLE R1
-					SELECT id_etudiant, id_salle
-					FROM etudiant, devoir_promo, groupe
-					WHERE etudiant.id_groupe=groupe.id_groupe
-					AND groupe.id_promo=devoir_promo.id_promo
-					AND devoir_promo.id_promo=$idPromo
-					AND id_devoir=$idDevoir
-					UNION
-					SELECT id_etudiant, id_salle
-					FROM etudiant, devoir_groupe, groupe
-					WHERE etudiant.id_groupe=groupe.id_groupe
-					AND devoir_groupe.id_groupe=groupe.id_groupe
-					AND groupe.id_promo=$idPromo
-					AND id_devoir=$idDevoir
-				");
-
-		$stmt = $pdo->prepare("SELECT salle.id_salle s, nom_etudiant, prenom_etudiant, nom_groupe, nom_promo, nom_dpt, nom_salle, place_x, place_y
-							   FROM R1, placement, groupe, etudiant, salle, promotion, departement
-							   WHERE R1.id_etudiant=placement.id_etudiant
-							   AND R1.id_etudiant=etudiant.id_etudiant
-							   AND R1.id_salle=salle.id_salle
-							   AND etudiant.id_groupe=groupe.id_groupe
-							   AND groupe.id_promo=promotion.id_promo
-							   AND promotion.id_dpt=departement.id_dpt
-							   AND id_devoir=:idDevoir
-							   ORDER BY nom_salle, nom_promo, nom_etudiant");
-		$stmt->execute(['idDevoir' => $idDevoir]);
+		$stmt = $pdo->prepare("
+			SELECT DISTINCT
+				s.id_salle AS s,
+				e.nom_etudiant,
+				e.prenom_etudiant,
+				g.nom_groupe,
+				p.nom_promo,
+				d.nom_dpt,
+				s.nom_salle,
+				pl.place_x,
+				pl.place_y
+			FROM placement pl
+			JOIN etudiant e ON e.id_etudiant = pl.id_etudiant
+			JOIN groupe g ON g.id_groupe = e.id_groupe
+			JOIN promotion p ON p.id_promo = g.id_promo
+			JOIN departement d ON d.id_dpt = p.id_dpt
+			JOIN salle s ON s.id_salle = pl.id_salle
+			WHERE pl.id_devoir = :idDevoir
+			  AND g.id_promo = :idPromo
+			  AND (
+					EXISTS (
+						SELECT 1
+						FROM devoir_promo dp
+						WHERE dp.id_devoir = pl.id_devoir
+						  AND dp.id_promo = g.id_promo
+					)
+					OR EXISTS (
+						SELECT 1
+						FROM devoir_groupe dg
+						WHERE dg.id_devoir = pl.id_devoir
+						  AND dg.id_groupe = e.id_groupe
+					)
+			  )
+			ORDER BY s.nom_salle, p.nom_promo, e.nom_etudiant
+		");
+		$stmt->execute([
+			'idDevoir' => $idDevoir,
+			'idPromo'  => $idPromo,
+		]);
 		
 		// RAZ Variables
 		$_SESSION['data'] = array(array());
@@ -164,6 +187,9 @@
 		
 		// Recuperation premier tour
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		if (!$result) {
+			return;
+		}
 		$salle = $result['s'];
 		// Recup struct Salle + place
 		recupStructSalle($result['s']);

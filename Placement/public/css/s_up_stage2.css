@@ -41,16 +41,32 @@
 /* ########## MISE EN FORME TABLEAU (grille placement seulement) ########## */
 
 .placement-grid-wrap {
-	overflow-x: visible;
+	overflow-x: auto;
 	max-width: 100%;
 	margin-bottom: 0.5rem;
+	scrollbar-width: thin;
+	scrollbar-color: #a0a0a0 transparent;
+}
+
+.placement-grid-wrap::-webkit-scrollbar {
+	height: 8px;
+}
+
+.placement-grid-wrap::-webkit-scrollbar-thumb {
+	background: #a0a0a0;
+	border-radius: 999px;
+}
+
+.placement-grid-wrap::-webkit-scrollbar-track {
+	background: transparent;
 }
 
 table.placement-grid {
 	border-collapse: separate;
 	border-spacing: 2px;
 	table-layout: fixed;
-	width: 100%;
+	width: max-content;
+	min-width: 100%;
 }
 
 .placeHandi
