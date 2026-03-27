@@ -179,7 +179,7 @@ btnnext.addEventListener('click', function(e) {
 	
 	switch(stage)
 	{
-		case "stage1":	if(parseInt(checkChamp())==6)
+		case "stage1":	if(parseInt(checkChamp())==4)
 						{
 							var form = document.querySelector('form');
 							var formData = new FormData(form);
