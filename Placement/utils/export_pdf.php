@@ -1,9 +1,13 @@
 <?php
+	if (ob_get_level() === 0) {
+		ob_start();
+	}
 	if (session_status() === PHP_SESSION_NONE) {
 		session_start();
 	}
 	// Les warnings/deprecations cassent le flux binaire PDF (headers déjà envoyés).
 	ini_set('display_errors', '0');
+	ini_set('zlib.output_compression', '0');
 	error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE & ~E_WARNING);
 	require_once __DIR__ . '/../config/connexion.php';
 	require_once __DIR__ . '/../libs/ezpdf/class.ezpdf.php';
@@ -50,9 +54,28 @@
 			ob_end_clean();
 		}
 		$content = $pdf->ezOutput();
+		if ($content === '' || strncmp($content, '%PDF', 4) !== 0) {
+			http_response_code(500);
+			header('Content-Type: text/plain; charset=utf-8');
+			echo "Erreur export PDF : contenu invalide genere.";
+			exit();
+		}
+
+		if (function_exists('header_remove')) {
+			header_remove();
+		}
+		if (function_exists('ini_set')) {
+			@ini_set('output_buffering', '0');
+			@ini_set('implicit_flush', '1');
+		}
 		header('Content-Type: application/pdf');
 		header('Content-Disposition: attachment; filename="' . $filename . '"');
+		header('Content-Transfer-Encoding: binary');
+		header('Accept-Ranges: none');
+		header('Cache-Control: private, max-age=0, must-revalidate');
+		header('Pragma: public');
 		header('Content-Length: ' . strlen($content));
+		flush();
 		echo $content;
 		exit();
 	}
