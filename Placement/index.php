@@ -209,7 +209,7 @@ switch ($action) {
         break;
 
     case 'export_pdf':
-        require_once __DIR__ . '/utils/export_pdf.php';
+        require_once __DIR__ . '/public/export_pdf.php';
         break;
 
     // =================== 404 ================================
