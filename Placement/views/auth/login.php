@@ -27,6 +27,7 @@
                 type="text"
                 name="login"
                 placeholder="Login"
+                value="<?php echo htmlspecialchars($loginValue ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                 autocomplete="username"
                 required
             >

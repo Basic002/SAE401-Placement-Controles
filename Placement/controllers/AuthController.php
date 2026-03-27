@@ -32,10 +32,12 @@ class AuthController
     {
         global $pdo;
         $erreur = null;
+        $loginValue = '';
 
-        if (isset($_POST['connexion']) && $_POST['connexion'] === 'Connexion') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $login = trim($_POST['login'] ?? '');
             $pass  = $_POST['pass']  ?? '';
+            $loginValue = $login;
 
             if ($login !== '' && $pass !== '') {
                 try {
